@@ -1,5 +1,4 @@
 package m.traffic.core.data.simulation;
 
-public class TrafficLight extends Item {
-
+public abstract class Item {
 }

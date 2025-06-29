@@ -25,17 +25,33 @@ public class CellularAutomatonModel implements TrafficModel {
   }
 
   private void randomiseCarPositionAndSpeed() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getConfig'");
+    for (int i = 0; i < config.roadLength(); ++i) {
+      road.add(new Cell(i));
+    }
+    
+    for (int i = 0; i < config.carCount(); ++i) {
+      Vehicle car;
+      do {
+        int speed = (int) (Math.random() * config.maxSpeed());
+        int position = (int) (Math.random() * config.roadLength());
+        car = new Vehicle(position, speed);
+
+      } while (road.get(car.getRoadPosition()).getItem() != null);
+      cars.add(car);
+      road.get(car.getRoadPosition()).setItem(car);
+    }
+
+    cars.sort((a, b) -> Integer.compare(a.getRoadPosition(), b.getRoadPosition()));
   }
 
   @Override
   public void nextStep() {
     for (int i = 0; i < cars.size(); ++i) { // TODO: implement in parallel
-      Vehicle nextCar = cars.get(i + 1);
+      int nextCarIndex = (i + 1) == cars.size() ? 0 : i + 1; // cycle to the first car
+      Vehicle nextCar = cars.get(nextCarIndex); // NB: should be sorted by road position
       Vehicle currentCar = cars.get(i);
 
-      int distanceToNextCar = nextCar.getRoadPosition() - currentCar.getRoadPosition();
+      int distanceToNextCar = getDistanceToNextCar(currentCar, nextCar);
 
       updateCarVelocity(currentCar, distanceToNextCar);
       ramdomlyBrake(currentCar);
@@ -45,11 +61,20 @@ public class CellularAutomatonModel implements TrafficModel {
     }
   }
 
+  private int getDistanceToNextCar(Vehicle currentCar, Vehicle nextCar) {
+    int distanceToNextCar = nextCar.getRoadPosition() - currentCar.getRoadPosition();
+    if (distanceToNextCar < 0) {
+      distanceToNextCar += config.roadLength(); // cycle around the road
+    }
+    return distanceToNextCar;
+  }
+
   private void updateCarVelocity(Vehicle currentCar, int distanceToNextCar) {
     // here can be added traffic light logic
     int nextVelocity = Math.min(currentCar.getVelocity() + 1, config.maxSpeed());
 
-    currentCar.setVelocity( Math.min(nextVelocity, distanceToNextCar - 1) );// distanceToNextCar-1 as we should update position before next car
+    // distanceToNextCar - 1 as we should update position before next car
+    currentCar.setVelocity( Math.min(nextVelocity, distanceToNextCar - 1) );
   }
   
   private void ramdomlyBrake(Vehicle currentCar) {
@@ -60,11 +85,17 @@ public class CellularAutomatonModel implements TrafficModel {
   }
 
   private void updateCarPosition(Vehicle currentCar) {
-    currentCar.setRoadPosition(currentCar.getRoadPosition() + currentCar.getVelocity());
+    road.get(currentCar.getRoadPosition()).setItem(null);
+    int nextPosition = currentCar.getRoadPosition() + currentCar.getVelocity();
+    if (nextPosition >= config.roadLength()) {
+      nextPosition = nextPosition % config.roadLength(); // cycle around the road
+    }
+    currentCar.setRoadPosition(nextPosition);
+    road.get(currentCar.getRoadPosition()).setItem(currentCar);
   }
 
   private float randomNextFloat() {
-    return 1;
+    return (float) Math.random(); // TODO: replace all Math.random() with a better random generator
   }
 
   @Override

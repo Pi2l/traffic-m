@@ -29,12 +29,12 @@ public class CellularAutomatonModel implements TrafficModel {
       road.add(new Cell(i));
     }
     
+    // randomly place cars on the road
     for (int i = 0; i < config.carCount(); ++i) {
       Vehicle car;
       do {
-        int speed = (int) (Math.random() * config.maxSpeed());
         int position = (int) (Math.random() * config.roadLength());
-        car = new Vehicle(position, speed);
+        car = new Vehicle(position, 0);
 
       } while (road.get(car.getRoadPosition()).getItem() != null);
       cars.add(car);
@@ -42,6 +42,20 @@ public class CellularAutomatonModel implements TrafficModel {
     }
 
     cars.sort((a, b) -> Integer.compare(a.getRoadPosition(), b.getRoadPosition()));
+
+    // randomly set car speeds
+    for (int i = 0; i < cars.size(); ++i) {
+      int speed = (int) (Math.random() * (config.maxSpeed() + 1));
+
+      int nextCarIndex = (i + 1) == cars.size() ? 0 : i + 1; // cycle to the first car
+      Vehicle currentCar = cars.get(i);
+
+      int distanceToNextCar = getDistanceToNextCar(currentCar, cars.get(nextCarIndex));
+      if (speed >= Math.max(0, distanceToNextCar - 1)) {
+        speed = Math.max(0, distanceToNextCar - 1); // ensure that the car does not collide with the next car
+      }
+      currentCar.setVelocity(speed);
+    }
   }
 
   @Override

@@ -33,7 +33,7 @@ public class CellularAutomatonModel implements TrafficModel {
     for (int i = 0; i < config.carCount(); ++i) {
       Vehicle car;
       do {
-        int position = (int) (Math.random() * config.roadLength());
+        int position = getRandomInt(config.roadLength());
         car = new Vehicle(position, 0);
 
       } while (road.get(car.getRoadPosition()).getItem() != null);
@@ -41,16 +41,15 @@ public class CellularAutomatonModel implements TrafficModel {
       road.get(car.getRoadPosition()).setItem(car);
     }
 
-    cars.sort((a, b) -> Integer.compare(a.getRoadPosition(), b.getRoadPosition()));
+    sortCarsByRoadPosition();
 
     // randomly set car speeds
-    for (int i = 0; i < cars.size(); ++i) {
-      int speed = (int) (Math.random() * (config.maxSpeed() + 1));
+    int carCount = cars.size();
+    for (int i = 0; i < carCount; ++i) {
+      int speed = getRandomInt(config.maxSpeed() + 1);
 
-      int nextCarIndex = (i + 1) == cars.size() ? 0 : i + 1; // cycle to the first car
       Vehicle currentCar = cars.get(i);
-
-      int distanceToNextCar = getDistanceToNextCar(currentCar, cars.get(nextCarIndex));
+      int distanceToNextCar = getDistanceToNextCar(currentCar, getNextCar(i, carCount));
       if (speed >= Math.max(0, distanceToNextCar - 1)) {
         speed = Math.max(0, distanceToNextCar - 1); // ensure that the car does not collide with the next car
       }
@@ -58,11 +57,19 @@ public class CellularAutomatonModel implements TrafficModel {
     }
   }
 
+  private void sortCarsByRoadPosition() {
+    cars.sort((a, b) -> Integer.compare(a.getRoadPosition(), b.getRoadPosition()));
+  }
+
+  private int getRandomInt(int max) {
+    return (int) (Math.random() * (max));
+  }
+
   @Override
   public void nextStep() {
-    for (int i = 0; i < cars.size(); ++i) { // TODO: implement in parallel
-      int nextCarIndex = (i + 1) == cars.size() ? 0 : i + 1; // cycle to the first car
-      Vehicle nextCar = cars.get(nextCarIndex); // NB: should be sorted by road position
+    int carCount = cars.size();
+    for (int i = 0; i < carCount; ++i) { // TODO: implement in parallel
+      Vehicle nextCar = getNextCar(i, carCount); // NB: should be sorted by road position
       Vehicle currentCar = cars.get(i);
 
       int distanceToNextCar = getDistanceToNextCar(currentCar, nextCar);
@@ -70,15 +77,32 @@ public class CellularAutomatonModel implements TrafficModel {
       updateCarVelocity(currentCar, distanceToNextCar);
       ramdomlyBrake(currentCar);
     }
+    // TODO: should cars to be sorted by road position?
     for (var currentCar : cars) {
       updateCarPosition(currentCar);
     }
+    sortCarsByRoadPosition();
+  }
+
+  private Vehicle getNextCar(int index, int carCount) {
+    boolean lastCar = (index + 1) == carCount;
+    if (!lastCar) {
+      return cars.get(index + 1);
+    } else if (lastCar && config.isCyclic()) {
+      return cars.get(0);
+    }
+    return new Vehicle(config.roadLength() + config.maxSpeed(), config.maxSpeed()); // no next car, so car is out of road
   }
 
   private int getDistanceToNextCar(Vehicle currentCar, Vehicle nextCar) {
     int distanceToNextCar = nextCar.getRoadPosition() - currentCar.getRoadPosition();
     if (distanceToNextCar < 0) {
-      distanceToNextCar += config.roadLength(); // cycle around the road
+      if (config.isCyclic()) {
+        distanceToNextCar += config.roadLength();
+      } else {
+        throw new IllegalStateException("Next car is behind the current car. Current car position: " 
+            + currentCar.getRoadPosition() + ", next car position: " + nextCar.getRoadPosition());
+      } 
     }
     return distanceToNextCar;
   }
@@ -102,7 +126,12 @@ public class CellularAutomatonModel implements TrafficModel {
     road.get(currentCar.getRoadPosition()).setItem(null);
     int nextPosition = currentCar.getRoadPosition() + currentCar.getVelocity();
     if (nextPosition >= config.roadLength()) {
-      nextPosition = nextPosition % config.roadLength(); // cycle around the road
+      if (config.isCyclic()) {
+        nextPosition = nextPosition % config.roadLength(); // cycle around the road
+      } else {
+        nextPosition = getRandomInt(cars.get(0).getRoadPosition()); // if not cyclic, place car randomly on the road
+        updateCarVelocity(currentCar, cars.get(0).getRoadPosition() - nextPosition); // speed is based on how car is placed on the road. Eg car passed 3 cells from 0, so its speed should be 3
+      }
     }
     currentCar.setRoadPosition(nextPosition);
     road.get(currentCar.getRoadPosition()).setItem(currentCar);

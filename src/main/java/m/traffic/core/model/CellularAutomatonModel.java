@@ -8,13 +8,15 @@ import m.traffic.core.data.simulation.Cell;
 import m.traffic.core.data.simulation.Vehicle;
 import m.traffic.core.data.state.SimulationStatistics;
 import m.traffic.core.data.state.TrafficSnapshot;
+import m.traffic.stats.StatsCollector;
 
 public class CellularAutomatonModel implements TrafficModel {
   private List<Cell> road;
   private List<Vehicle> cars;
   private SimulationConfig config;
   private TrafficSnapshot trafficSnapshot;
-  private SimulationStatistics simulationStatistics;
+  private SimulationStatistics simulationStatistics = new SimulationStatistics(0, 0, 0, 0);
+  private StatsCollector statsCollector = new StatsCollector();
 
   @Override
   public void initialise(SimulationConfig config) {
@@ -77,11 +79,18 @@ public class CellularAutomatonModel implements TrafficModel {
       updateCarVelocity(currentCar, distanceToNextCar);
       ramdomlyBrake(currentCar);
     }
-    // TODO: should cars to be sorted by road position?
+
     for (var currentCar : cars) {
       updateCarPosition(currentCar);
     }
     sortCarsByRoadPosition();
+    takeSnapshot();
+    updateSimulationStatistics(getSnapshot());
+  }
+
+  private void updateSimulationStatistics(TrafficSnapshot snapshot) {
+    statsCollector.addToStats(simulationStatistics, snapshot);
+    statsCollector.writeStatsToCsv(simulationStatistics);
   }
 
   private Vehicle getNextCar(int index, int carCount) {
@@ -156,4 +165,9 @@ public class CellularAutomatonModel implements TrafficModel {
     return simulationStatistics;
   }
 
+  private void takeSnapshot() {
+    trafficSnapshot = new TrafficSnapshot();
+    trafficSnapshot.setRoad(road);
+    trafficSnapshot.setCars(cars);
+  }
 }

@@ -13,6 +13,6 @@ public class TrafficSnapshot {
 
   private List<Cell> road;
   private List<Vehicle> cars;
+  private int stepCount;
   private int stepDuration;
-
 }

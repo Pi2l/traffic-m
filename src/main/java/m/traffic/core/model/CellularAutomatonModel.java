@@ -16,11 +16,13 @@ public class CellularAutomatonModel implements TrafficModel {
   private SimulationConfig config;
   private TrafficSnapshot trafficSnapshot;
   private SimulationStatistics simulationStatistics = new SimulationStatistics(0, 0, 0, 0);
-  private StatsCollector statsCollector = new StatsCollector();
+  private StatsCollector statsCollector;
+  private int stepCount = 0;
 
   @Override
   public void initialise(SimulationConfig config) {
     this.config = config;
+    statsCollector = new StatsCollector(config);
     road = new ArrayList<>(config.roadLength());
     cars = new ArrayList<>(config.carCount());
     randomiseCarPositionAndSpeed();
@@ -86,6 +88,7 @@ public class CellularAutomatonModel implements TrafficModel {
     sortCarsByRoadPosition();
     takeSnapshot();
     updateSimulationStatistics(getSnapshot());
+    stepCount++;
   }
 
   private void updateSimulationStatistics(TrafficSnapshot snapshot) {
@@ -100,7 +103,9 @@ public class CellularAutomatonModel implements TrafficModel {
     } else if (lastCar && config.isCyclic()) {
       return cars.get(0);
     }
-    return new Vehicle(config.roadLength() + config.maxSpeed(), config.maxSpeed()); // no next car, so car is out of road
+    return cars.get(0).getRoadPosition() != 0 
+        ? new Vehicle(config.roadLength() + config.maxSpeed(), config.maxSpeed()) // no next car, so car is out of road
+        : new Vehicle(config.roadLength(), 0); // next car is just before out of road to avoid collision with car tath is at the first place
   }
 
   private int getDistanceToNextCar(Vehicle currentCar, Vehicle nextCar) {
@@ -121,7 +126,7 @@ public class CellularAutomatonModel implements TrafficModel {
     int nextVelocity = Math.min(currentCar.getVelocity() + 1, config.maxSpeed());
 
     // distanceToNextCar - 1 as we should update position before next car
-    currentCar.setVelocity( Math.min(nextVelocity, distanceToNextCar - 1) );
+    currentCar.setVelocity( Math.min(nextVelocity, Math.max(distanceToNextCar - 1, 0)) );
   }
   
   private void ramdomlyBrake(Vehicle currentCar) {
@@ -138,8 +143,8 @@ public class CellularAutomatonModel implements TrafficModel {
       if (config.isCyclic()) {
         nextPosition = nextPosition % config.roadLength(); // cycle around the road
       } else {
-        nextPosition = getRandomInt(cars.get(0).getRoadPosition()); // if not cyclic, place car randomly on the road
-        updateCarVelocity(currentCar, cars.get(0).getRoadPosition() - nextPosition); // speed is based on how car is placed on the road. Eg car passed 3 cells from 0, so its speed should be 3
+        nextPosition = Math.min(getRandomInt(cars.get(0).getRoadPosition()), config.maxSpeed() - 1); // if not cyclic, place car randomly on the road
+        updateCarVelocity(currentCar, Math.max(nextPosition, 1)); // speed is based on how car is placed on the road. Eg car passed 3 cells from 0, so its speed should be 3
       }
     }
     currentCar.setRoadPosition(nextPosition);
@@ -169,5 +174,6 @@ public class CellularAutomatonModel implements TrafficModel {
     trafficSnapshot = new TrafficSnapshot();
     trafficSnapshot.setRoad(road);
     trafficSnapshot.setCars(cars);
+    trafficSnapshot.setStepCount(stepCount);
   }
 }

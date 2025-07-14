@@ -36,8 +36,18 @@ public class ConfigParser {
       float breakingProbability = Float.parseFloat(configMap.getOrDefault("breakingProbability",
                                       defaultConfig.breakingProbability() + ""));
       boolean isCyclic = Boolean.parseBoolean(configMap.getOrDefault("isCyclic", defaultConfig.isCyclic() + ""));
+      String outputFilePrefix = configMap.getOrDefault("outputFilePrefix", defaultConfig.outputFilePrefix());
+      int stepCount = Integer.parseInt(configMap.getOrDefault("stepCount", defaultConfig.stepCount() + ""));
 
-      return new SimulationConfig(roadLength, carCount, maxSpeed, stepDuration, breakingProbability, isCyclic);
+      return new SimulationConfig(
+                    roadLength,
+                    carCount,
+                    maxSpeed,
+                    stepDuration,
+                    breakingProbability,
+                    isCyclic,
+                    outputFilePrefix,
+                    stepCount);
     } catch (NumberFormatException e) {
       e.printStackTrace();
       return null;

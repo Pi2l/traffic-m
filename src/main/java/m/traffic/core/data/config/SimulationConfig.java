@@ -6,9 +6,13 @@ public record SimulationConfig(
   int maxSpeed,
   int stepDuration,
   float breakingProbability,
-  boolean isCyclic
+  boolean isCyclic,
+  String outputFilePrefix,
+  int stepCount
 ) {
+  public static final int INFINITE_STEP_COUNT = -1;
+
   public static SimulationConfig defaultConfig() {
-    return new SimulationConfig(20, 3, 5, 300, 0.3f, false);
+    return new SimulationConfig(20, 3, 5, 100, 0.3f, false, "out/test", 200);
   }
 }

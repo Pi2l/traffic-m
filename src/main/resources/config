@@ -1,0 +1,8 @@
+roadLength=1000
+stepCount=1000
+carCount=200
+maxSpeed=5
+stepDuration=10
+breakingProbability=0.33
+isCyclic=true
+outputFilePrefix=out/test

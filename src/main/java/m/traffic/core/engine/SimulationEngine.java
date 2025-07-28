@@ -25,7 +25,7 @@ public class SimulationEngine {
       sleepSimulation(modelConfig);
       TrafficSnapshot snapshot = model.getSnapshot();
 
-      // process the snapshot, e.g., update UI or log data
+      // process the snapshot
       statsCollector.writeSnapshotToFile(snapshot);
       // statsCollector.addToStats(model.getSimulationStatistics(), snapshot);
 

@@ -2,6 +2,7 @@ package m.traffic.core.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import m.traffic.core.data.config.SimulationConfig;
 import m.traffic.core.data.simulation.Cell;
@@ -19,6 +20,7 @@ public class Rule184 implements TrafficModel {
   private SimulationStatistics simulationStatistics = new SimulationStatistics(0, 0, 0, 0);
   private StatsCollector statsCollector;
   private int stepCount = 0;
+  private Random random;
 
   @Override
   public void initialise(SimulationConfig config) {
@@ -26,6 +28,7 @@ public class Rule184 implements TrafficModel {
       throw new IllegalArgumentException("Rule 184 requires max speed to be 1");
     }
     this.config = config;
+    random = new Random(config.randomSeed());
 
     statsCollector = new StatsCollector(config);
     road = new ArrayList<>(config.roadLength());
@@ -54,7 +57,7 @@ public class Rule184 implements TrafficModel {
   }
 
   private int getRandomInt(int max) {
-    return (int) (Math.random() * (max));
+    return random.nextInt(0, max);
   }
 
   private void copyRoad(List<Cell> source, List<Cell> target) {

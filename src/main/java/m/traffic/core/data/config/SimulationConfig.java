@@ -8,11 +8,12 @@ public record SimulationConfig(
   float breakingProbability,
   boolean isCyclic,
   String outputFilePrefix,
-  int stepCount
+  int stepCount,
+  long randomSeed
 ) {
   public static final int INFINITE_STEP_COUNT = -1;
 
   public static SimulationConfig defaultConfig() {
-    return new SimulationConfig(20, 3, 5, 100, 0.3f, false, "out/test", 200);
+    return new SimulationConfig(20, 3, 5, 100, 0.3f, false, "out/test", 200, 394);
   }
 }

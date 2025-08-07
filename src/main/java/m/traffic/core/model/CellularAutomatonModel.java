@@ -2,6 +2,7 @@ package m.traffic.core.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import m.traffic.core.data.config.SimulationConfig;
 import m.traffic.core.data.simulation.Cell;
@@ -17,11 +18,14 @@ public class CellularAutomatonModel implements TrafficModel {
   private TrafficSnapshot trafficSnapshot;
   private SimulationStatistics simulationStatistics = new SimulationStatistics(0, 0, 0, 0);
   private StatsCollector statsCollector;
+  private Random random;
   private int stepCount = 0;
 
   @Override
   public void initialise(SimulationConfig config) {
     this.config = config;
+    random = new Random(config.randomSeed());
+
     statsCollector = new StatsCollector(config);
     road = new ArrayList<>(config.roadLength());
     cars = new ArrayList<>(config.carCount());
@@ -66,7 +70,7 @@ public class CellularAutomatonModel implements TrafficModel {
   }
 
   private int getRandomInt(int max) {
-    return (int) (Math.random() * (max));
+    return random.nextInt(0, max);
   }
 
   @Override
@@ -152,7 +156,7 @@ public class CellularAutomatonModel implements TrafficModel {
   }
 
   private float randomNextFloat() {
-    return (float) Math.random(); // TODO: replace all Math.random() with a better random generator
+    return random.nextFloat();
   }
 
   @Override

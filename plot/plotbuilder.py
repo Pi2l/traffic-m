@@ -62,6 +62,7 @@ def draw_plots(position: np.ndarray, velocity: np.ndarray, time: np.ndarray, par
   plt.savefig(output_prefix + "_plots.png", dpi=300)
 
 def main() -> int:
+  # config_file_path = "./src/main/resources/config-184"
   config_file_path = "./src/main/resources/config"
   configs = read_config(config_file_path)
   print(configs)

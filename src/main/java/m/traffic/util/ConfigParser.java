@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 import m.traffic.core.data.config.SimulationConfig;
+import m.traffic.core.model.type.ModelType;
 
 public class ConfigParser {
 
@@ -49,7 +50,9 @@ public class ConfigParser {
                     isCyclic,
                     outputFilePrefix,
                     stepCount,
-                    randomSeed);
+                    randomSeed,
+                    ModelType.fromString(configMap.getOrDefault("model", defaultConfig.modelType().getName()))
+      );
     } catch (NumberFormatException e) {
       e.printStackTrace();
       return null;

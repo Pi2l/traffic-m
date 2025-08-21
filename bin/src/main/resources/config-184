@@ -1,0 +1,11 @@
+//INFINITE_STEP_COUNT = -1
+model=Rule_184
+roadLength=8
+stepCount=10
+carCount=4
+maxSpeed=1
+stepDuration=10
+breakingProbability=0
+isCyclic=false
+outputFilePrefix=out/test-184
+randomSeed=322

@@ -9,7 +9,7 @@ import m.traffic.util.ConfigParser;
 public class Main {
   public static void main( String[] args ) {
     SimulationConfig config = ConfigParser.getSimulationConfig( args );
-    TrafficModel model = ModelFactory.createModel( config.modelType() );
+    TrafficModel model = ModelFactory.createModel( config.getModelType() );
     model.initialise(config);
 
     SimulationEngine engine = new SimulationEngine( model );

@@ -38,7 +38,7 @@ public class SimulationEngine {
       return false;
     }
     SimulationConfig config = model.getConfig();
-    int configStepCount = config.stepCount();
+    int configStepCount = config.getStepCount();
     running = configStepCount == SimulationConfig.INFINITE_STEP_COUNT 
                   || snapshot.getStepCount() <= configStepCount;
     return running;
@@ -46,7 +46,7 @@ public class SimulationEngine {
 
   private void sleepSimulation(SimulationConfig config) {
     try {
-      Thread.sleep(config.stepDuration());
+      Thread.sleep(config.getStepDuration());
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       running = false;

@@ -23,7 +23,7 @@ public class StatsCollector {
 
   public StatsCollector(SimulationConfig simulationConfig) {
     this.simulationConfig = simulationConfig;
-    String filenamePrefix = simulationConfig.outputFilePrefix();
+    String filenamePrefix = simulationConfig.getOutputFilePrefix();
     try {
       File velocityFile = openOrCreateFile(filenamePrefix + "_velocity");
       velocityWriter = new BufferedWriter(new FileWriter(velocityFile));
@@ -52,11 +52,11 @@ public class StatsCollector {
   public void addToStats(SimulationStatistics simulationStatistics, TrafficSnapshot snapshot) {
     double density = statsCalculator.calculateDensity(snapshot);
     double averageSpeed = statsCalculator.calculateAverageSpeed(snapshot);
-    double flux = statsCalculator.calculateFlux(snapshot);
+    double flow = statsCalculator.calculateFlow(snapshot);
 
     simulationStatistics.addDencity(density);
     simulationStatistics.addAverageSpeed(averageSpeed);
-    simulationStatistics.addFlux(flux);
+    simulationStatistics.addFlow(flow);
     simulationStatistics.incrementIterationCount();
   }
 
@@ -131,7 +131,7 @@ public class StatsCollector {
       index = index % velocities.size();
     } else {
       if (index >= velocities.size()) {
-        return simulationConfig.maxSpeed(); // next car is out of bounds, return max speed
+        return simulationConfig.getMaxSpeed(); // next car is out of bounds, return max speed
       }
     }
     return velocities.get(index);

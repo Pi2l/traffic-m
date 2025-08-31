@@ -12,6 +12,8 @@ import m.traffic.core.data.state.TrafficSnapshot;
 import m.traffic.stats.StatsCollector;
 
 public class Rule184 implements TrafficModel {
+  private static final int DETECTOR_POSITION = 0;
+
   private List<Cell> road;
   private List<Cell> nextStepRoad;
   private List<Vehicle> cars;
@@ -20,34 +22,35 @@ public class Rule184 implements TrafficModel {
   private SimulationStatistics simulationStatistics = new SimulationStatistics(0, 0, 0, 0);
   private StatsCollector statsCollector;
   private int stepCount = 0;
+  private int totalVehiclesPassed = 0;
   private Random random;
 
   @Override
   public void initialise(SimulationConfig config) {
-    if (config.maxSpeed() != 1) {
+    if (config.getMaxSpeed() != 1) {
       throw new IllegalArgumentException("Rule 184 requires max speed to be 1");
     }
     this.config = config;
-    random = new Random(config.randomSeed());
+    random = new Random(config.getRandomSeed());
 
     statsCollector = new StatsCollector(config);
-    road = new ArrayList<>(config.roadLength());
-    nextStepRoad = new ArrayList<>(config.roadLength());
-    cars = new ArrayList<>(config.carCount());
+    road = new ArrayList<>(config.getRoadLength());
+    nextStepRoad = new ArrayList<>(config.getRoadLength());
+    cars = new ArrayList<>(config.getCarCount());
     randomiseCarPositionAndSpeed();
   }
 
   private void randomiseCarPositionAndSpeed() {
-    for (int i = 0; i < config.roadLength(); ++i) {
+    for (int i = 0; i < config.getRoadLength(); ++i) {
       road.add(new Cell(i));
     }
     
     // randomly place cars on the road
-    for (int i = 0; i < config.carCount(); ++i) {
+    for (int i = 0; i < config.getCarCount(); ++i) {
       Vehicle car;
       do {
-        int position = getRandomInt(config.roadLength());
-        car = new Vehicle(position, config.maxSpeed()); // Rule 184 uses max speed of 1
+        int position = getRandomInt(config.getRoadLength());
+        car = new Vehicle(position, config.getMaxSpeed()); // Rule 184 uses max speed of 1
 
       } while (road.get(car.getRoadPosition()).getItem() != null);
       cars.add(car);
@@ -71,7 +74,7 @@ public class Rule184 implements TrafficModel {
 
   @Override
   public void nextStep() {
-    for (int i = 0; i < config.roadLength(); ++i) {
+    for (int i = 0; i < config.getRoadLength(); ++i) {
       Vehicle leftCar = getVehicle(i - 1);
       Vehicle currentCar = getVehicle(i);
       Vehicle rightCar = getVehicle(i + 1);
@@ -87,6 +90,7 @@ public class Rule184 implements TrafficModel {
         nextStepRoad.get(i).setItem(currentCar);
       }
     }
+    checkIfVehiclePassedDetector();
 
     copyRoad(nextStepRoad, road);
     takeSnapshot();
@@ -94,8 +98,14 @@ public class Rule184 implements TrafficModel {
     stepCount++;
   }
 
+  private void checkIfVehiclePassedDetector() {
+    if (this.road.get(DETECTOR_POSITION).getItem() != null) {
+      totalVehiclesPassed++;
+    }
+  }
+
   private Vehicle getVehicle(int i) {
-    int roadLength = config.roadLength();
+    int roadLength = config.getRoadLength();
     int index = 0;
     if (config.isCyclic()) {
       index = (i + roadLength) % roadLength; // wrap around if negative
@@ -103,7 +113,7 @@ public class Rule184 implements TrafficModel {
       // TODO: this code can cause random spawning of vehicle on the road and also can remove vehicle from it
       // cannot be implemented in not cyclic mode?
       if (i < 0 || i >= roadLength) { // randomly return a vehicle with max speed if out of bounds
-        int randomNum = getRandomInt(config.maxSpeed() + 1); // maxSpeed is 1, so randomNum can be 0 or 1
+        int randomNum = getRandomInt(config.getMaxSpeed() + 1); // maxSpeed is 1, so randomNum can be 0 or 1
         return randomNum == 1 ? new Vehicle(i, randomNum) : null;
       } else {
         index = i;
@@ -118,6 +128,7 @@ public class Rule184 implements TrafficModel {
     trafficSnapshot.setRoad(road);
     trafficSnapshot.setCars(cars);
     trafficSnapshot.setStepCount(stepCount);
+    trafficSnapshot.setTotalVehiclesPassed(totalVehiclesPassed);
   }
 
   private void updateSimulationStatistics(TrafficSnapshot snapshot) {

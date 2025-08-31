@@ -1,0 +1,13 @@
+model=acceleration_based_model
+roadLength=1000
+stepCount=1000
+carCount=200
+maxSpeed=5
+stepDuration=10
+isCyclic=true
+outputFilePrefix=out/test-acceleration-based
+randomSeed=311
+startAccelerationProbability=0.7
+lowSpeedThreshold=2
+lowSpeedThresholdBreakingProbability=0.2
+breakingProbability=0.33

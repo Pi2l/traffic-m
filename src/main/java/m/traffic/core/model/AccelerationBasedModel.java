@@ -3,7 +3,7 @@ package m.traffic.core.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
+import m.traffic.core.data.config.AccelerationBasedModelConfig;
 import m.traffic.core.data.config.SimulationConfig;
 import m.traffic.core.data.simulation.Cell;
 import m.traffic.core.data.simulation.Vehicle;
@@ -11,11 +11,11 @@ import m.traffic.core.data.state.SimulationStatistics;
 import m.traffic.core.data.state.TrafficSnapshot;
 import m.traffic.stats.StatsCollector;
 
-public class CellularAutomatonModel implements TrafficModel {
+public class AccelerationBasedModel implements TrafficModel {
   private static final int DETECTOR_POSITION = 0;
   private List<Cell> road;
   private List<Vehicle> cars;
-  private SimulationConfig config;
+  private AccelerationBasedModelConfig config;
   private TrafficSnapshot trafficSnapshot;
   private SimulationStatistics simulationStatistics = new SimulationStatistics(0, 0, 0, 0);
   private StatsCollector statsCollector;
@@ -25,12 +25,15 @@ public class CellularAutomatonModel implements TrafficModel {
 
   @Override
   public void initialise(SimulationConfig config) {
-    this.config = config;
-    random = new Random(config.getRandomSeed());
+    if (!(config instanceof AccelerationBasedModelConfig abmConfig)) {
+      throw new IllegalArgumentException("Config should be of type AccelerationBasedModelConfig");
+    }
+    this.config = abmConfig;
+    random = new Random(abmConfig.getRandomSeed());
 
-    statsCollector = new StatsCollector(config);
-    road = new ArrayList<>(config.getRoadLength());
-    cars = new ArrayList<>(config.getCarCount());
+    statsCollector = new StatsCollector(abmConfig);
+    road = new ArrayList<>(abmConfig.getRoadLength());
+    cars = new ArrayList<>(abmConfig.getCarCount());
     randomiseCarPositionAndSpeed();
   }
 
@@ -78,14 +81,14 @@ public class CellularAutomatonModel implements TrafficModel {
   @Override
   public void nextStep() {
     int carCount = cars.size();
-    for (int i = 0; i < carCount; ++i) { // TODO: implement in parallel
+    for (int i = 0; i < carCount; ++i) {
       Vehicle nextCar = getNextCar(i, carCount); // NB: should be sorted by road position
       Vehicle currentCar = cars.get(i);
 
       int distanceToNextCar = getDistanceToNextCar(currentCar, nextCar);
 
       updateCarVelocity(currentCar, distanceToNextCar);
-      ramdomlyBrake(currentCar);
+      randomlyBrake(currentCar);
     }
 
     for (var currentCar : cars) {
@@ -136,17 +139,32 @@ public class CellularAutomatonModel implements TrafficModel {
   }
 
   private void updateCarVelocity(Vehicle currentCar, int distanceToNextCar) {
-    // here can be added traffic light logic
     int nextVelocity = Math.min(currentCar.getVelocity() + 1, config.getMaxSpeed());
 
     // distanceToNextCar - 1 as we should update position before next car
     currentCar.setVelocity( Math.min(nextVelocity, Math.max(distanceToNextCar - 1, 0)) );
   }
   
-  private void ramdomlyBrake(Vehicle currentCar) {
-    int carVelocity = currentCar.getVelocity();
-    if (randomNextFloat() < config.getBreakingProbability() && carVelocity > 0) {
-      currentCar.setVelocity(carVelocity - 1);
+  private void randomlyBrake(Vehicle currentCar) {
+    int carAcceleratedVelocity = currentCar.getVelocity();
+    int carCurrentVelocity = carAcceleratedVelocity - 1;
+    float randomValue = randomNextFloat();
+  
+    if (carAcceleratedVelocity == 0) {
+      return; // cannot brake if car is not moving
+    }
+
+    if (carCurrentVelocity == 0 && randomValue < config.getStartAccelerationProbability()) { // slow to start rule
+      currentCar.setVelocity(carAcceleratedVelocity - 1);
+    } else if (randomValue < config.getLowSpeedThresholdBreakingProbability() && carCurrentVelocity < config.getLowSpeedThreshold()) {
+      // low speed car less likely to brake
+      currentCar.setVelocity(carAcceleratedVelocity - 1);
+    } else if (randomValue < config.getBreakingProbability()) {
+      // normal braking
+      currentCar.setVelocity(carAcceleratedVelocity - 1);
+    } else if (randomValue < Math.min(1, config.getBreakingProbability() + 0.1f) && carCurrentVelocity >= (config.getMaxSpeed() - 1)) {
+      // chance to accelerate if car is at max speed should be lower
+      currentCar.setVelocity(carAcceleratedVelocity - 1);
     }
   }
 

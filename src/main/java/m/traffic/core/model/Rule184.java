@@ -79,6 +79,7 @@ public class Rule184 implements TrafficModel {
       Vehicle currentCar = getVehicle(i);
       Vehicle rightCar = getVehicle(i + 1);
 
+      checkIfVehiclePassedDetector(currentCar, rightCar);
       // Rule 184 logic: if the left car is 1 and current car is 0 then set current car to 1
       // or if the current car is 1 and right car is 0 then set current car to 0
       // else keep the current car's velocity
@@ -90,7 +91,6 @@ public class Rule184 implements TrafficModel {
         nextStepRoad.get(i).setItem(currentCar);
       }
     }
-    checkIfVehiclePassedDetector();
 
     copyRoad(nextStepRoad, road);
     takeSnapshot();
@@ -98,8 +98,8 @@ public class Rule184 implements TrafficModel {
     stepCount++;
   }
 
-  private void checkIfVehiclePassedDetector() {
-    if (this.road.get(DETECTOR_POSITION).getItem() != null) {
+  private void checkIfVehiclePassedDetector(Vehicle currentCar, Vehicle rightCar) {
+    if (currentCar != null && rightCar == null && currentCar.getRoadPosition() == DETECTOR_POSITION) {
       totalVehiclesPassed++;
     }
   }
@@ -128,7 +128,7 @@ public class Rule184 implements TrafficModel {
     trafficSnapshot.setRoad(road);
     trafficSnapshot.setCars(cars);
     trafficSnapshot.setStepCount(stepCount);
-    trafficSnapshot.setTotalVehiclesPassed(totalVehiclesPassed);
+    trafficSnapshot.setVehiclesPassed(totalVehiclesPassed);
   }
 
   private void updateSimulationStatistics(TrafficSnapshot snapshot) {

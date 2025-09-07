@@ -5,35 +5,34 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class SimulationStatistics {
 
-  private double dencitySum;
-  private double averageSpeedSum;
-  private double fluxSum;
-  // private double averageDistanceToNextCarSum;
-  
+  private double densitySum; // sum of densities over all iterations
+  private double averageSpeedSum; // sum of average speeds over all iterations
+  private double flowSum; // sum of flows over all iterations
+
   private long iterationCount;
 
-  public double getDencity() {
-    return dencitySum / iterationCount;
+  public double getDensity() {
+    return densitySum / iterationCount;
   }
 
   public double getAverageSpeed() {
     return averageSpeedSum / iterationCount;
   }
 
-  public double getFlux() {
-    return fluxSum / iterationCount;
+  public double getFlow() {
+    return flowSum / iterationCount;
   }
 
-  public void addDencity(double dencity) {
-    dencitySum += dencity;
+  public void addDensity(double density) {
+    densitySum += density;
   }
 
   public void addAverageSpeed(double averageSpeed) {
     averageSpeedSum += averageSpeed;
   }
 
-  public void addFlux(double flux) {
-    fluxSum += flux;
+  public void addFlow(double flow) {
+    flowSum += flow;
   }
 
   public void incrementIterationCount() {

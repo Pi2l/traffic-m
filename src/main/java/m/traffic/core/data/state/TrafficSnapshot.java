@@ -15,5 +15,5 @@ public class TrafficSnapshot {
   private List<Vehicle> cars;
   private int stepCount;
   private int stepDuration;
-  private int totalVehiclesPassed;
+  private int vehiclesPassed;
 }

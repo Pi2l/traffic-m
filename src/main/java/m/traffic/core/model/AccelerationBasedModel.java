@@ -92,9 +92,9 @@ public class AccelerationBasedModel implements TrafficModel {
     }
 
     for (var currentCar : cars) {
+      checkIfVehiclePassesDetector(currentCar);
       updateCarPosition(currentCar);
     }
-    checkIfVehiclePassedDetector();
 
     sortCarsByRoadPosition();
     takeSnapshot();
@@ -102,9 +102,27 @@ public class AccelerationBasedModel implements TrafficModel {
     stepCount++;
   }
 
-  private void checkIfVehiclePassedDetector() {
-    if (this.road.get(DETECTOR_POSITION).getItem() != null) {
-      totalVehiclesPassed++;
+  private void checkIfVehiclePassesDetector(Vehicle currentCar) {
+    if (config.isCyclic()) {
+      int nextCarPosition = getCarNextPosition(currentCar);
+      boolean atDetectorNow = currentCar.getRoadPosition() == DETECTOR_POSITION;
+      for (int pos = currentCar.getRoadPosition() + 1; (pos % config.getRoadLength()) != ((nextCarPosition + 1) % config.getRoadLength()); pos++) {
+        int checkPos = pos % config.getRoadLength();
+        if (checkPos == DETECTOR_POSITION) {
+          // should pass detector in the next step
+          atDetectorNow = true;
+          continue;
+        }
+        if (atDetectorNow) {
+          totalVehiclesPassed++;
+          break;
+        }
+      }
+    } else {
+      if (currentCar.getRoadPosition() < DETECTOR_POSITION && 
+          currentCar.getRoadPosition() + currentCar.getVelocity() >= DETECTOR_POSITION) {
+        totalVehiclesPassed++;
+      }
     }
   }
 
@@ -170,6 +188,12 @@ public class AccelerationBasedModel implements TrafficModel {
 
   private void updateCarPosition(Vehicle currentCar) {
     road.get(currentCar.getRoadPosition()).setItem(null);
+    int nextPosition = getCarNextPosition(currentCar);
+    currentCar.setRoadPosition(nextPosition);
+    road.get(currentCar.getRoadPosition()).setItem(currentCar);
+  }
+
+  private int getCarNextPosition(Vehicle currentCar) {
     int nextPosition = currentCar.getRoadPosition() + currentCar.getVelocity();
     if (nextPosition >= config.getRoadLength()) {
       if (config.isCyclic()) {
@@ -179,8 +203,7 @@ public class AccelerationBasedModel implements TrafficModel {
         updateCarVelocity(currentCar, Math.max(nextPosition, 1)); // speed is based on how car is placed on the road. Eg car passed 3 cells from 0, so its speed should be 3
       }
     }
-    currentCar.setRoadPosition(nextPosition);
-    road.get(currentCar.getRoadPosition()).setItem(currentCar);
+    return nextPosition;
   }
 
   private float randomNextFloat() {
@@ -207,6 +230,6 @@ public class AccelerationBasedModel implements TrafficModel {
     trafficSnapshot.setRoad(road);
     trafficSnapshot.setCars(cars);
     trafficSnapshot.setStepCount(stepCount);
-    trafficSnapshot.setTotalVehiclesPassed(totalVehiclesPassed);
+    trafficSnapshot.setVehiclesPassed(totalVehiclesPassed);
   }
 }

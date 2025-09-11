@@ -21,7 +21,7 @@ public class AccelerationBasedModel implements TrafficModel {
   private StatsCollector statsCollector;
   private Random random;
   private int stepCount = 0;
-  private int totalVehiclesPassed = 0;
+  private int vehiclesPassedPerStep = 0;
 
   @Override
   public void initialise(SimulationConfig config) {
@@ -99,6 +99,7 @@ public class AccelerationBasedModel implements TrafficModel {
     sortCarsByRoadPosition();
     takeSnapshot();
     updateSimulationStatistics(getSnapshot());
+    vehiclesPassedPerStep = 0;
     stepCount++;
   }
 
@@ -114,14 +115,14 @@ public class AccelerationBasedModel implements TrafficModel {
           continue;
         }
         if (atDetectorNow) {
-          totalVehiclesPassed++;
+          vehiclesPassedPerStep++;
           break;
         }
       }
     } else {
       if (currentCar.getRoadPosition() < DETECTOR_POSITION && 
           currentCar.getRoadPosition() + currentCar.getVelocity() >= DETECTOR_POSITION) {
-        totalVehiclesPassed++;
+        vehiclesPassedPerStep++;
       }
     }
   }
@@ -230,6 +231,6 @@ public class AccelerationBasedModel implements TrafficModel {
     trafficSnapshot.setRoad(road);
     trafficSnapshot.setCars(cars);
     trafficSnapshot.setStepCount(stepCount);
-    trafficSnapshot.setVehiclesPassed(totalVehiclesPassed);
+    trafficSnapshot.setVehiclesPassed(vehiclesPassedPerStep);
   }
 }

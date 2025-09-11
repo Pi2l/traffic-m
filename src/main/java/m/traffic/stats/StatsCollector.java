@@ -54,7 +54,7 @@ public class StatsCollector {
     double averageSpeed = statsCalculator.calculateAverageSpeed(snapshot);
     double flow = statsCalculator.calculateFlow(snapshot);
 
-    simulationStatistics.addDencity(density);
+    simulationStatistics.addDensity(density);
     simulationStatistics.addAverageSpeed(averageSpeed);
     simulationStatistics.addFlow(flow);
     simulationStatistics.incrementIterationCount();

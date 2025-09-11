@@ -22,7 +22,7 @@ public class Rule184 implements TrafficModel {
   private SimulationStatistics simulationStatistics = new SimulationStatistics(0, 0, 0, 0);
   private StatsCollector statsCollector;
   private int stepCount = 0;
-  private int totalVehiclesPassed = 0;
+  private int vehiclesPassedPerStep = 0;
   private Random random;
 
   @Override
@@ -95,12 +95,13 @@ public class Rule184 implements TrafficModel {
     copyRoad(nextStepRoad, road);
     takeSnapshot();
     updateSimulationStatistics(getSnapshot());
+    vehiclesPassedPerStep = 0;
     stepCount++;
   }
 
   private void checkIfVehiclePassedDetector(Vehicle currentCar, Vehicle rightCar) {
     if (currentCar != null && rightCar == null && currentCar.getRoadPosition() == DETECTOR_POSITION) {
-      totalVehiclesPassed++;
+      vehiclesPassedPerStep++;
     }
   }
 
@@ -128,7 +129,7 @@ public class Rule184 implements TrafficModel {
     trafficSnapshot.setRoad(road);
     trafficSnapshot.setCars(cars);
     trafficSnapshot.setStepCount(stepCount);
-    trafficSnapshot.setVehiclesPassed(totalVehiclesPassed);
+    trafficSnapshot.setVehiclesPassed(vehiclesPassedPerStep);
   }
 
   private void updateSimulationStatistics(TrafficSnapshot snapshot) {

@@ -134,7 +134,7 @@ public class Rule184 implements TrafficModel {
 
   private void updateSimulationStatistics(TrafficSnapshot snapshot) {
     statsCollector.addToStats(simulationStatistics, snapshot);
-    statsCollector.writeStatsToCsv(simulationStatistics);
+    statsCollector.writeStatsToFile(simulationStatistics);
   }
 
   @Override

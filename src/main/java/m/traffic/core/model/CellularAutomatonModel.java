@@ -126,7 +126,7 @@ public class CellularAutomatonModel implements TrafficModel {
 
   private void updateSimulationStatistics(TrafficSnapshot snapshot) {
     statsCollector.addToStats(simulationStatistics, snapshot);
-    statsCollector.writeStatsToCsv(simulationStatistics);
+    statsCollector.writeStatsToFile(simulationStatistics);
   }
 
   private Vehicle getNextCar(int index, int carCount) {

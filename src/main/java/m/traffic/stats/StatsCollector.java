@@ -4,9 +4,11 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import m.traffic.core.data.config.AccelerationBasedModelConfig;
 import m.traffic.core.data.config.SimulationConfig;
 import m.traffic.core.data.state.SimulationStatistics;
 import m.traffic.core.data.state.TrafficSnapshot;
+import m.traffic.core.model.type.ModelType;
 
 public class StatsCollector {
 
@@ -21,7 +23,7 @@ public class StatsCollector {
 
   public StatsCollector(SimulationConfig simulationConfig) {
     this.statsWriter = new StatsWriter(simulationConfig);
-    String filenamePrefix = simulationConfig.getOutputFilePrefix();
+    String filenamePrefix = getFilePrefix(simulationConfig);
     try {
       velocityWriter = initFile(filenamePrefix + "_velocity");
       positionWriter = initFile(filenamePrefix + "_position");
@@ -32,6 +34,28 @@ public class StatsCollector {
     } catch (IOException e) {
       e.printStackTrace();
     }
+  }
+
+  private String getFilePrefix(SimulationConfig config) {
+    // file name should be: file_prefix + road length + car count + max speed + breaking p. + other configs from specific model confings
+    String filePrefix = "%s_L=%d_N=%d_Vmax=%d_p=%.2f".formatted(
+          config.getOutputFilePrefix(),
+          config.getRoadLength(),
+          config.getCarCount(),
+          config.getMaxSpeed(),
+          config.getBreakingProbability()
+        );
+
+    if (config.getModelType() == ModelType.ACCELERATION_BASED_MODEL && 
+        config instanceof AccelerationBasedModelConfig abmConfig) {
+      // startAccelerationProbability, lowSpeedThreshold, lowSpeedThresholdBreakingProbability
+      filePrefix += "p0=%.2f_LST=%d_pLST=%.2f".formatted(
+          abmConfig.getStartAccelerationProbability(),
+          abmConfig.getLowSpeedThreshold(),
+          abmConfig.getLowSpeedThresholdBreakingProbability()
+      );
+    }
+    return filePrefix;
   }
 
   private BufferedWriter initFile(String filenamePrefix) throws IOException {

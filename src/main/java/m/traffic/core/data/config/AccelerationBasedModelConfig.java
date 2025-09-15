@@ -7,9 +7,9 @@ import m.traffic.core.model.type.ModelType;
 @Getter
 @Setter
 public class AccelerationBasedModelConfig extends SimulationConfig {
-  private final float startAccelerationProbability;
-  private final int lowSpeedThreshold;
-  private final float lowSpeedThresholdBreakingProbability;
+  private float startAccelerationProbability;
+  private int lowSpeedThreshold;
+  private float lowSpeedThresholdBreakingProbability;
     
   public AccelerationBasedModelConfig(int roadLength, int carCount, int maxSpeed,
       int stepDuration, float breakingProbability, boolean isCyclic, String outputFilePrefix,
@@ -43,6 +43,24 @@ public class AccelerationBasedModelConfig extends SimulationConfig {
       0.5f,
       2,
       0.2f
+    );
+  }
+
+  public static AccelerationBasedModelConfig copyConfig(AccelerationBasedModelConfig config) {
+    return new AccelerationBasedModelConfig(
+        config.getRoadLength(),
+        config.getCarCount(),
+        config.getMaxSpeed(),
+        config.getStepDuration(),
+        config.getBreakingProbability(),
+        config.isCyclic(),
+        config.getOutputFilePrefix(),
+        config.getStepCount(),
+        config.getRandomSeed(),
+        config.getModelType(),
+        config.getStartAccelerationProbability(),
+        config.getLowSpeedThreshold(),
+        config.getLowSpeedThresholdBreakingProbability()
     );
   }
 }

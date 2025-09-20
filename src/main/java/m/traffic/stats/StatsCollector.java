@@ -23,20 +23,22 @@ public class StatsCollector {
 
   public StatsCollector(SimulationConfig simulationConfig) {
     this.statsWriter = new StatsWriter(simulationConfig);
-    String filenamePrefix = getFilePrefix(simulationConfig);
+    String directoryName = getPrefix(simulationConfig);
+    initDirectory(directoryName);
+
     try {
-      velocityWriter = initFile(filenamePrefix + "_velocity");
-      positionWriter = initFile(filenamePrefix + "_position");
-      timeWriter = initFile(filenamePrefix + "_time");
-      densityWriter = initFile(filenamePrefix + "_density");
-      averageSpeedWriter = initFile(filenamePrefix + "_average_speed");
-      flowWriter = initFile(filenamePrefix + "_flow");
+      velocityWriter = initFile(directoryName + "/velocity");
+      positionWriter = initFile(directoryName + "/position");
+      timeWriter = initFile(directoryName + "/time");
+      densityWriter = initFile(directoryName + "/density");
+      averageSpeedWriter = initFile(directoryName + "/average_speed");
+      flowWriter = initFile(directoryName + "/flow");
     } catch (IOException e) {
       e.printStackTrace();
     }
   }
 
-  private String getFilePrefix(SimulationConfig config) {
+  private String getPrefix(SimulationConfig config) {
     // file name should be: file_prefix + road length + car count + max speed + breaking p. + other configs from specific model confings
     String filePrefix = "%s_L=%d_N=%d_Vmax=%d_p=%.2f".formatted(
           config.getOutputFilePrefix(),
@@ -56,6 +58,15 @@ public class StatsCollector {
       );
     }
     return filePrefix;
+  }
+
+  private void initDirectory(String directoryName) {
+    File directory = new File(directoryName);
+    if (!directory.exists()) {
+      if (!directory.mkdirs()) {
+        throw new RuntimeException("Failed to create directory: " + directoryName);
+      }
+    }
   }
 
   private BufferedWriter initFile(String filenamePrefix) throws IOException {

@@ -213,6 +213,11 @@ public class CellularAutomatonModel implements TrafficModel {
     return simulationStatistics;
   }
 
+  @Override
+  public StatsCollector getStatsCollector() {
+    return statsCollector;
+  }
+
   private void takeSnapshot() {
     trafficSnapshot = new TrafficSnapshot();
     trafficSnapshot.setRoad(road);

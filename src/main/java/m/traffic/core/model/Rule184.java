@@ -152,4 +152,8 @@ public class Rule184 implements TrafficModel {
     return simulationStatistics;
   }
 
+  @Override
+  public StatsCollector getStatsCollector() {
+    return statsCollector;
+  }
 }

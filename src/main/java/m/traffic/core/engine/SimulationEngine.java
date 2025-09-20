@@ -13,7 +13,7 @@ public class SimulationEngine {
 
   public SimulationEngine(TrafficModel model) {
     this.model = model;
-    this.statsCollector = new StatsCollector(model.getConfig());
+    this.statsCollector = model.getStatsCollector();
   }
 
   public void run() {

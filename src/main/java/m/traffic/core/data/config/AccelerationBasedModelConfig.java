@@ -9,13 +9,13 @@ import m.traffic.core.model.type.ModelType;
 public class AccelerationBasedModelConfig extends SimulationConfig {
   private double startAccelerationProbability;
   private int lowSpeedThreshold;
-  private double lowSpeedThresholdBreakingProbability;
+  private double lowSpeedThresholdBrakingProbability;
     
   public AccelerationBasedModelConfig(int roadLength, int carCount, int maxSpeed,
-      int stepDuration, double breakingProbability, boolean isCyclic, String outputFilePrefix,
+      int stepDuration, double brakingProbability, boolean isCyclic, String outputFilePrefix,
       int stepCount, long randomSeed, ModelType modelType,
-      double startAccelerationProbability, int lowSpeedThreshold, double lowSpeedThresholdBreakingProbability) {
-    super(roadLength, carCount, maxSpeed, stepDuration, breakingProbability, isCyclic, outputFilePrefix,
+      double startAccelerationProbability, int lowSpeedThreshold, double lowSpeedThresholdBrakingProbability) {
+    super(roadLength, carCount, maxSpeed, stepDuration, brakingProbability, isCyclic, outputFilePrefix,
         stepCount, randomSeed, modelType);
 
     if (lowSpeedThreshold >= maxSpeed) {
@@ -24,7 +24,7 @@ public class AccelerationBasedModelConfig extends SimulationConfig {
 
     this.startAccelerationProbability = startAccelerationProbability;
     this.lowSpeedThreshold = lowSpeedThreshold;
-    this.lowSpeedThresholdBreakingProbability = lowSpeedThresholdBreakingProbability;
+    this.lowSpeedThresholdBrakingProbability = lowSpeedThresholdBrakingProbability;
   }
 
   public static AccelerationBasedModelConfig defaultConfig() {
@@ -34,7 +34,7 @@ public class AccelerationBasedModelConfig extends SimulationConfig {
       baseConfig.getCarCount(),
       baseConfig.getMaxSpeed(),
       baseConfig.getStepDuration(),
-      baseConfig.getBreakingProbability(),
+      baseConfig.getBrakingProbability(),
       baseConfig.isCyclic(),
       baseConfig.getOutputFilePrefix(),
       baseConfig.getStepCount(),
@@ -52,7 +52,7 @@ public class AccelerationBasedModelConfig extends SimulationConfig {
         config.getCarCount(),
         config.getMaxSpeed(),
         config.getStepDuration(),
-        config.getBreakingProbability(),
+        config.getBrakingProbability(),
         config.isCyclic(),
         config.getOutputFilePrefix(),
         config.getStepCount(),
@@ -60,7 +60,7 @@ public class AccelerationBasedModelConfig extends SimulationConfig {
         config.getModelType(),
         config.getStartAccelerationProbability(),
         config.getLowSpeedThreshold(),
-        config.getLowSpeedThresholdBreakingProbability()
+        config.getLowSpeedThresholdBrakingProbability()
     );
   }
 }

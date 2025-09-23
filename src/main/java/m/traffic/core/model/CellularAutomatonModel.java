@@ -164,7 +164,7 @@ public class CellularAutomatonModel implements TrafficModel {
   
   private void randomlyBrake(Vehicle currentCar) {
     int carVelocity = currentCar.getVelocity();
-    if (randomNextDouble() < config.getBreakingProbability() && carVelocity > 0) {
+    if (randomNextDouble() < config.getBrakingProbability() && carVelocity > 0) {
       currentCar.setVelocity(carVelocity - 1);
     }
   }

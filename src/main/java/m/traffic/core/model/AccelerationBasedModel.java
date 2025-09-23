@@ -175,13 +175,13 @@ public class AccelerationBasedModel implements TrafficModel {
 
     if (carCurrentVelocity == 0 && randomValue < config.getStartAccelerationProbability()) { // slow to start rule
       currentCar.setVelocity(carAcceleratedVelocity - 1);
-    } else if (randomValue < config.getLowSpeedThresholdBreakingProbability() && carCurrentVelocity < config.getLowSpeedThreshold()) {
+    } else if (randomValue < config.getLowSpeedThresholdBrakingProbability() && carCurrentVelocity < config.getLowSpeedThreshold()) {
       // low speed car less likely to brake
       currentCar.setVelocity(carAcceleratedVelocity - 1);
-    } else if (randomValue < config.getBreakingProbability()) {
+    } else if (randomValue < config.getBrakingProbability()) {
       // normal braking
       currentCar.setVelocity(carAcceleratedVelocity - 1);
-    } else if (randomValue < Math.min(1, config.getBreakingProbability() + 0.1f) && carCurrentVelocity >= (config.getMaxSpeed() - 1)) {
+    } else if (randomValue < Math.min(1, config.getBrakingProbability() + 0.1f) && carCurrentVelocity >= (config.getMaxSpeed() - 1)) {
       // chance to accelerate if car is at max speed should be lower
       currentCar.setVelocity(carAcceleratedVelocity - 1);
     }

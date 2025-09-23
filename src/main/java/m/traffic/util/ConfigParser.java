@@ -21,10 +21,10 @@ enum OptionType {
   CAR_NUMBER("car", "deltaCarNumber"), //format: min:max:delta
   ROAD_LENGTH("l", "deltaRoadLength"), //format: min:max:delta
   MAX_SPEED("s", "deltaMaxSpeed"), //format: min:max:delta
-  BREAKING_PROBABILITY("b", "deltaBreakingProbability"),
+  BRAKING_PROBABILITY("b", "deltaBrakingProbability"),
   P0_PROBABILITY("p0", "deltaP0Probability"),
   LOW_SPEED_THRESHOLD("t", "deltaLowSpeedThreshold"),
-  LOW_SPEED_THRESHOLD_BREAKING_PROBABILITY("tp", "deltaLowSpeedThresholdBreakingProbability"),
+  LOW_SPEED_THRESHOLD_BRAKING_PROBABILITY("tp", "deltaLowSpeedThresholdBrakingProbability"),
   STEP_COUNT("n", "stepCount"),
   CONFIG_FILE("c", "configFile");
 
@@ -53,19 +53,19 @@ public class ConfigParser {
         .addOption( createOption(OptionType.MAX_SPEED.shortName,
                                  OptionType.MAX_SPEED.longName,
                                  OptionType.MAX_SPEED.name(), "delta max speed", false) )
-        .addOption( createOption(OptionType.BREAKING_PROBABILITY.shortName,
-                                 OptionType.BREAKING_PROBABILITY.longName,
-                                 OptionType.BREAKING_PROBABILITY.name(), "delta breaking probability", false) )
+        .addOption( createOption(OptionType.BRAKING_PROBABILITY.shortName,
+                                 OptionType.BRAKING_PROBABILITY.longName,
+                                 OptionType.BRAKING_PROBABILITY.name(), "delta braking probability", false) )
         .addOption( createOption(OptionType.P0_PROBABILITY.shortName,
                                  OptionType.P0_PROBABILITY.longName,
                                  OptionType.P0_PROBABILITY.name(), "delta initial acceleration probability", false) )
         .addOption( createOption(OptionType.LOW_SPEED_THRESHOLD.shortName,
                                  OptionType.LOW_SPEED_THRESHOLD.longName,
                                  OptionType.LOW_SPEED_THRESHOLD.name(), "delta low speed (t)hreshold", false) )
-        .addOption( createOption(OptionType.LOW_SPEED_THRESHOLD_BREAKING_PROBABILITY.shortName,
-                                 OptionType.LOW_SPEED_THRESHOLD_BREAKING_PROBABILITY.longName,
-                                 OptionType.LOW_SPEED_THRESHOLD_BREAKING_PROBABILITY.name(),
-                                 "delta low speed threshold breaking probability", false) )
+        .addOption( createOption(OptionType.LOW_SPEED_THRESHOLD_BRAKING_PROBABILITY.shortName,
+                                 OptionType.LOW_SPEED_THRESHOLD_BRAKING_PROBABILITY.longName,
+                                 OptionType.LOW_SPEED_THRESHOLD_BRAKING_PROBABILITY.name(),
+                                 "delta low speed threshold braking probability", false) )
         .addOption( createOption(OptionType.STEP_COUNT.shortName,
                                  OptionType.STEP_COUNT.longName,
                                  OptionType.STEP_COUNT.name(), "number of steps to simulate", false) )
@@ -87,7 +87,7 @@ public class ConfigParser {
         case CAR_NUMBER -> configs.addAll(parseIntConfig(commandLine, optionType, config, SimulationConfig::setCarCount));
         case ROAD_LENGTH -> configs.addAll(parseIntConfig(commandLine, optionType, config, SimulationConfig::setRoadLength));
         case MAX_SPEED -> configs.addAll(parseIntConfig(commandLine, optionType, config, SimulationConfig::setMaxSpeed));
-        case BREAKING_PROBABILITY -> configs.addAll(parseDoubleConfig(commandLine, optionType, config, SimulationConfig::setBreakingProbability));
+        case BRAKING_PROBABILITY -> configs.addAll(parseDoubleConfig(commandLine, optionType, config, SimulationConfig::setBrakingProbability));
         case P0_PROBABILITY -> configs.addAll(parseDoubleConfig(commandLine, optionType, config,
           (conf, value) -> {
             if (conf instanceof AccelerationBasedModelConfig abmc) {
@@ -100,10 +100,10 @@ public class ConfigParser {
               abmc.setLowSpeedThreshold(value);
             }
           }));
-        case LOW_SPEED_THRESHOLD_BREAKING_PROBABILITY -> configs.addAll(parseDoubleConfig(commandLine, optionType, config,
+        case LOW_SPEED_THRESHOLD_BRAKING_PROBABILITY -> configs.addAll(parseDoubleConfig(commandLine, optionType, config,
           (conf, value) -> {
             if (conf instanceof AccelerationBasedModelConfig abmc) {
-              abmc.setLowSpeedThresholdBreakingProbability(value);
+              abmc.setLowSpeedThresholdBrakingProbability(value);
             }
           }));
         case STEP_COUNT -> configs.addAll(parseIntConfig(commandLine, optionType, config, SimulationConfig::setStepCount));
@@ -193,8 +193,8 @@ public class ConfigParser {
       int carCount = Integer.parseInt(configMap.getOrDefault("carCount", defaultConfig.getCarCount() + ""));
       int maxSpeed = Integer.parseInt(configMap.getOrDefault("maxSpeed", defaultConfig.getMaxSpeed() + ""));
       int stepDuration = Integer.parseInt(configMap.getOrDefault("stepDuration", defaultConfig.getStepDuration() + ""));
-      double breakingProbability = Double.parseDouble(configMap.getOrDefault("breakingProbability",
-                                      defaultConfig.getBreakingProbability() + ""));
+      double brakingProbability = Double.parseDouble(configMap.getOrDefault("brakingProbability",
+                                      defaultConfig.getBrakingProbability() + ""));
       boolean isCyclic = Boolean.parseBoolean(configMap.getOrDefault("isCyclic", defaultConfig.isCyclic() + ""));
       String outputFilePrefix = configMap.getOrDefault("outputFilePrefix", defaultConfig.getOutputFilePrefix());
       int stepCount = Integer.parseInt(configMap.getOrDefault("stepCount", defaultConfig.getStepCount() + ""));
@@ -205,7 +205,7 @@ public class ConfigParser {
                     carCount,
                     maxSpeed,
                     stepDuration,
-                    breakingProbability,
+                    brakingProbability,
                     isCyclic,
                     outputFilePrefix,
                     stepCount,
@@ -226,16 +226,16 @@ public class ConfigParser {
                                       defaultConfig.getStartAccelerationProbability() + ""));
       int lowSpeedThreshold = Integer.parseInt(configMap.getOrDefault("lowSpeedThreshold",
                                       defaultConfig.getLowSpeedThreshold() + ""));
-      double lowSpeedThresholdBreakingProbability = Double.parseDouble(configMap.getOrDefault(
-                                      "lowSpeedThresholdBreakingProbability",
-                                      defaultConfig.getLowSpeedThresholdBreakingProbability() + ""));
+      double lowSpeedThresholdBrakingProbability = Double.parseDouble(configMap.getOrDefault(
+                                      "lowSpeedThresholdBrakingProbability",
+                                      defaultConfig.getLowSpeedThresholdBrakingProbability() + ""));
 
       return new AccelerationBasedModelConfig(
                     baseConfig.getRoadLength(),
                     baseConfig.getCarCount(),
                     baseConfig.getMaxSpeed(),
                     baseConfig.getStepDuration(),
-                    baseConfig.getBreakingProbability(),
+                    baseConfig.getBrakingProbability(),
                     baseConfig.isCyclic(),
                     baseConfig.getOutputFilePrefix(),
                     baseConfig.getStepCount(),
@@ -243,7 +243,7 @@ public class ConfigParser {
                     baseConfig.getModelType(),
                     startAccelerationProbability,
                     lowSpeedThreshold,
-                    lowSpeedThresholdBreakingProbability
+                    lowSpeedThresholdBrakingProbability
       );
     } catch (NumberFormatException e) {
       e.printStackTrace();

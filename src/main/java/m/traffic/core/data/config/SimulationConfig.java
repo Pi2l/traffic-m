@@ -15,7 +15,7 @@ public class SimulationConfig {
   private int carCount;
   private int maxSpeed;
   private int stepDuration;
-  private double breakingProbability;
+  private double brakingProbability;
   private boolean isCyclic;
   private String outputFilePrefix;
   private int stepCount;
@@ -32,7 +32,7 @@ public class SimulationConfig {
         config.carCount,
         config.maxSpeed,
         config.stepDuration,
-        config.breakingProbability,
+        config.brakingProbability,
         config.isCyclic,
         config.outputFilePrefix,
         config.stepCount,

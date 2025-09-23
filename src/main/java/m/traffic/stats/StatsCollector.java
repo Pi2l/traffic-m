@@ -39,22 +39,22 @@ public class StatsCollector {
   }
 
   private String getPrefix(SimulationConfig config) {
-    // file name should be: file_prefix + road length + car count + max speed + breaking p. + other configs from specific model confings
+    // file name should be: file_prefix + road length + car count + max speed + braking p. + other configs from specific model confings
     String filePrefix = "%s_L=%d_N=%d_Vmax=%d_p=%.2f".formatted(
           config.getOutputFilePrefix(),
           config.getRoadLength(),
           config.getCarCount(),
           config.getMaxSpeed(),
-          config.getBreakingProbability()
+          config.getBrakingProbability()
         );
 
     if (config.getModelType() == ModelType.ACCELERATION_BASED_MODEL && 
         config instanceof AccelerationBasedModelConfig abmConfig) {
-      // startAccelerationProbability, lowSpeedThreshold, lowSpeedThresholdBreakingProbability
+      // startAccelerationProbability, lowSpeedThreshold, lowSpeedThresholdBrakingProbability
       filePrefix += "p0=%.2f_LST=%d_pLST=%.2f".formatted(
           abmConfig.getStartAccelerationProbability(),
           abmConfig.getLowSpeedThreshold(),
-          abmConfig.getLowSpeedThresholdBreakingProbability()
+          abmConfig.getLowSpeedThresholdBrakingProbability()
       );
     }
     return filePrefix;

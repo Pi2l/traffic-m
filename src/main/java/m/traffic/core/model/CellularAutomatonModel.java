@@ -85,7 +85,7 @@ public class CellularAutomatonModel implements TrafficModel {
       int distanceToNextCar = getDistanceToNextCar(currentCar, nextCar);
 
       updateCarVelocity(currentCar, distanceToNextCar);
-      ramdomlyBrake(currentCar);
+      randomlyBrake(currentCar);
     }
 
     for (var currentCar : cars) {
@@ -162,9 +162,9 @@ public class CellularAutomatonModel implements TrafficModel {
     currentCar.setVelocity( Math.min(nextVelocity, Math.max(distanceToNextCar - 1, 0)) );
   }
   
-  private void ramdomlyBrake(Vehicle currentCar) {
+  private void randomlyBrake(Vehicle currentCar) {
     int carVelocity = currentCar.getVelocity();
-    if (randomNextFloat() < config.getBreakingProbability() && carVelocity > 0) {
+    if (randomNextDouble() < config.getBreakingProbability() && carVelocity > 0) {
       currentCar.setVelocity(carVelocity - 1);
     }
   }
@@ -194,8 +194,8 @@ public class CellularAutomatonModel implements TrafficModel {
     return nextPosition;
   }
 
-  private float randomNextFloat() {
-    return random.nextFloat();
+  private double randomNextDouble() {
+    return random.nextDouble();
   }
 
   @Override

@@ -87,8 +87,8 @@ public class ConfigParser {
         case CAR_NUMBER -> configs.addAll(parseIntConfig(commandLine, optionType, config, SimulationConfig::setCarCount));
         case ROAD_LENGTH -> configs.addAll(parseIntConfig(commandLine, optionType, config, SimulationConfig::setRoadLength));
         case MAX_SPEED -> configs.addAll(parseIntConfig(commandLine, optionType, config, SimulationConfig::setMaxSpeed));
-        case BREAKING_PROBABILITY -> configs.addAll(parseFloatConfig(commandLine, optionType, config, SimulationConfig::setBreakingProbability));
-        case P0_PROBABILITY -> configs.addAll(parseFloatConfig(commandLine, optionType, config,
+        case BREAKING_PROBABILITY -> configs.addAll(parseDoubleConfig(commandLine, optionType, config, SimulationConfig::setBreakingProbability));
+        case P0_PROBABILITY -> configs.addAll(parseDoubleConfig(commandLine, optionType, config,
           (conf, value) -> {
             if (conf instanceof AccelerationBasedModelConfig abmc) {
               abmc.setStartAccelerationProbability(value);
@@ -100,7 +100,7 @@ public class ConfigParser {
               abmc.setLowSpeedThreshold(value);
             }
           }));
-        case LOW_SPEED_THRESHOLD_BREAKING_PROBABILITY -> configs.addAll(parseFloatConfig(commandLine, optionType, config,
+        case LOW_SPEED_THRESHOLD_BREAKING_PROBABILITY -> configs.addAll(parseDoubleConfig(commandLine, optionType, config,
           (conf, value) -> {
             if (conf instanceof AccelerationBasedModelConfig abmc) {
               abmc.setLowSpeedThresholdBreakingProbability(value);
@@ -143,16 +143,16 @@ public class ConfigParser {
     };
   }
 
-  private static List<? extends SimulationConfig> parseFloatConfig(CommandLine commandLine, OptionType optionType,
-      SimulationConfig config, BiConsumer<SimulationConfig, Float> setter) {
+  private static List<? extends SimulationConfig> parseDoubleConfig(CommandLine commandLine, OptionType optionType,
+      SimulationConfig config, BiConsumer<SimulationConfig, Double> setter) {
     List<SimulationConfig> configs = new ArrayList<>();
 
     if (commandLine.hasOption(optionType.shortName)) {
       String value = commandLine.getOptionValue(optionType.shortName);
-      float minValue = Float.parseFloat(getValue(value, 0));
-      float maxValue = Float.parseFloat(getValue(value, 1));
-      float deltaValue = Float.parseFloat(getValue(value, 2));
-      for (float i = minValue; i <= maxValue; i += deltaValue) {
+      double minValue = Double.parseDouble(getValue(value, 0));
+      double maxValue = Double.parseDouble(getValue(value, 1));
+      double deltaValue = Double.parseDouble(getValue(value, 2));
+      for (double i = minValue; i <= maxValue; i += deltaValue) {
         SimulationConfig newConfig = copyConfig(config);
         setter.accept(newConfig, i);
         configs.add(newConfig);
@@ -193,7 +193,7 @@ public class ConfigParser {
       int carCount = Integer.parseInt(configMap.getOrDefault("carCount", defaultConfig.getCarCount() + ""));
       int maxSpeed = Integer.parseInt(configMap.getOrDefault("maxSpeed", defaultConfig.getMaxSpeed() + ""));
       int stepDuration = Integer.parseInt(configMap.getOrDefault("stepDuration", defaultConfig.getStepDuration() + ""));
-      float breakingProbability = Float.parseFloat(configMap.getOrDefault("breakingProbability",
+      double breakingProbability = Double.parseDouble(configMap.getOrDefault("breakingProbability",
                                       defaultConfig.getBreakingProbability() + ""));
       boolean isCyclic = Boolean.parseBoolean(configMap.getOrDefault("isCyclic", defaultConfig.isCyclic() + ""));
       String outputFilePrefix = configMap.getOrDefault("outputFilePrefix", defaultConfig.getOutputFilePrefix());
@@ -222,11 +222,11 @@ public class ConfigParser {
                                                                             HashMap<String, String> configMap) {
     try {
       AccelerationBasedModelConfig defaultConfig = AccelerationBasedModelConfig.defaultConfig();
-      float startAccelerationProbability = Float.parseFloat(configMap.getOrDefault("startAccelerationProbability",
+      double startAccelerationProbability = Double.parseDouble(configMap.getOrDefault("startAccelerationProbability",
                                       defaultConfig.getStartAccelerationProbability() + ""));
       int lowSpeedThreshold = Integer.parseInt(configMap.getOrDefault("lowSpeedThreshold",
                                       defaultConfig.getLowSpeedThreshold() + ""));
-      float lowSpeedThresholdBreakingProbability = Float.parseFloat(configMap.getOrDefault(
+      double lowSpeedThresholdBreakingProbability = Double.parseDouble(configMap.getOrDefault(
                                       "lowSpeedThresholdBreakingProbability",
                                       defaultConfig.getLowSpeedThresholdBreakingProbability() + ""));
 

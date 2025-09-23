@@ -167,7 +167,7 @@ public class AccelerationBasedModel implements TrafficModel {
   private void randomlyBrake(Vehicle currentCar) {
     int carAcceleratedVelocity = currentCar.getVelocity();
     int carCurrentVelocity = carAcceleratedVelocity - 1;
-    float randomValue = randomNextFloat();
+    double randomValue = randomNextDouble();
   
     if (carAcceleratedVelocity == 0) {
       return; // cannot brake if car is not moving
@@ -207,8 +207,8 @@ public class AccelerationBasedModel implements TrafficModel {
     return nextPosition;
   }
 
-  private float randomNextFloat() {
-    return random.nextFloat();
+  private double randomNextDouble() {
+    return random.nextDouble();
   }
 
   @Override

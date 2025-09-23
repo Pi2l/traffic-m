@@ -7,14 +7,14 @@ import m.traffic.core.model.type.ModelType;
 @Getter
 @Setter
 public class AccelerationBasedModelConfig extends SimulationConfig {
-  private float startAccelerationProbability;
+  private double startAccelerationProbability;
   private int lowSpeedThreshold;
-  private float lowSpeedThresholdBreakingProbability;
+  private double lowSpeedThresholdBreakingProbability;
     
   public AccelerationBasedModelConfig(int roadLength, int carCount, int maxSpeed,
-      int stepDuration, float breakingProbability, boolean isCyclic, String outputFilePrefix,
+      int stepDuration, double breakingProbability, boolean isCyclic, String outputFilePrefix,
       int stepCount, long randomSeed, ModelType modelType,
-      float startAccelerationProbability, int lowSpeedThreshold, float lowSpeedThresholdBreakingProbability) {
+      double startAccelerationProbability, int lowSpeedThreshold, double lowSpeedThresholdBreakingProbability) {
     super(roadLength, carCount, maxSpeed, stepDuration, breakingProbability, isCyclic, outputFilePrefix,
         stepCount, randomSeed, modelType);
 

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.logging.Logger;
 import org.apache.commons.cli.ParseException;
 import m.traffic.core.data.config.SimulationConfig;
 import m.traffic.core.engine.SimulationEngine;
@@ -13,6 +14,9 @@ import m.traffic.core.model.factory.ModelFactory;
 import m.traffic.util.ConfigParser;
 
 public class Main {
+
+  private static final Logger logger = Logger.getLogger(Main.class.getName());
+
   public static void main( String[] args ) throws ParseException {
     int poolSize = Runtime.getRuntime().availableProcessors();
     ExecutorService pool = Executors.newFixedThreadPool(poolSize);
@@ -38,9 +42,10 @@ public class Main {
   private static void completeAll( List<Future<?>> futures ) {
     for (Future<?> future : futures) {
       try {
+        logger.info("Waiting for a simulation configuration to complete...");
         future.get();
       } catch (Exception e) {
-        System.err.println("Error occurred while processing a simulation configuration: " + e.getMessage());
+        logger.severe("Error occurred while processing a simulation configuration: " + e.getMessage());
         e.printStackTrace();
       }
     }

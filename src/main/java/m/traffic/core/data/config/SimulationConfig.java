@@ -15,7 +15,7 @@ public class SimulationConfig {
   private int carCount;
   private int maxSpeed;
   private int stepDuration;
-  private float breakingProbability;
+  private double breakingProbability;
   private boolean isCyclic;
   private String outputFilePrefix;
   private int stepCount;

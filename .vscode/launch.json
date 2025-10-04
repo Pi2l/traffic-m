@@ -1,0 +1,58 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Run Java Main class with args",
+      "request": "launch",
+      "mainClass": "m.traffic.Main",
+      "args": [
+        "-c",
+        "${input:config file}",
+        "${input:additional args}"
+      ]
+    },
+    {
+      "type": "java",
+      "name": "Main",
+      "request": "launch",
+      "mainClass": "m.traffic.Main",
+      // "args": "-c ./src/main/resources/config",
+      // "args": "-c ./src/main/resources/acceleration-based-config -l 3:10:1",
+      // "args": "-c ./src/main/resources/acceleration-based-config",
+      "args": "-c ./src/main/resources/config-184",
+      "projectName": "m"
+    },
+    {
+      "type": "debugpy",
+      "request": "launch",
+      "name": "Python: Plotbuilder",
+      "args": [
+        "${input:config file}"
+      ],
+      "program": "${file}",
+    },
+  ],
+  "inputs": [
+    {
+      "id": "config file",
+      "type": "pickString",
+      "description": "Select a config file",
+      "options": [
+        "./src/main/resources/config",
+        "./src/main/resources/acceleration-based-config",
+        "./src/main/resources/config-184"
+      ],
+      "default": "acceleration-based-config"
+    },
+    {
+      "id": "additional args",
+      "type": "promptString",
+      "description": "Input additional arguments (e.g., -l 3:10:1)",
+      "default": ""
+    }
+  ]
+}

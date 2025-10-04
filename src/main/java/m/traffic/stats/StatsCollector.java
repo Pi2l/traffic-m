@@ -51,7 +51,7 @@ public class StatsCollector {
     if (config.getModelType() == ModelType.ACCELERATION_BASED_MODEL && 
         config instanceof AccelerationBasedModelConfig abmConfig) {
       // startAccelerationProbability, lowSpeedThreshold, lowSpeedThresholdBrakingProbability
-      filePrefix += "p0=%.2f_LST=%d_pLST=%.2f".formatted(
+      filePrefix += "_p0=%.2f_LST=%d_pLST=%.2f".formatted(
           abmConfig.getStartAccelerationProbability(),
           abmConfig.getLowSpeedThreshold(),
           abmConfig.getLowSpeedThresholdBrakingProbability()

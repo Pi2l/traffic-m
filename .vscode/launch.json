@@ -16,24 +16,13 @@
       ]
     },
     {
-      "type": "java",
-      "name": "Main",
-      "request": "launch",
-      "mainClass": "m.traffic.Main",
-      // "args": "-c ./src/main/resources/config",
-      // "args": "-c ./src/main/resources/acceleration-based-config -l 3:10:1",
-      // "args": "-c ./src/main/resources/acceleration-based-config",
-      "args": "-c ./src/main/resources/config-184",
-      "projectName": "m"
-    },
-    {
       "type": "debugpy",
       "request": "launch",
       "name": "Python: Plotbuilder",
       "args": [
         "${input:config file}"
       ],
-      "program": "${file}",
+      "program": "./plot/plotbuilder.py",
     },
   ],
   "inputs": [

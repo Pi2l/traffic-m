@@ -1,16 +1,9 @@
 import numpy as np
 
+from config.config_utils import read_config
+
 KEYS_TO_IGNORE = {"outputFilePrefix", "isCyclic", "stepDuration"}
 
-def read_config(file_name: str) -> dict:
-  configs = dict()
-
-  with open(file_name, "r") as file:
-    lines = file.readlines()
-    for line in lines:
-      key, value = line.split("=")
-      configs[key.strip()] = value.strip()
-  return configs
 
 def get_extends(position: np.ndarray, time: np.ndarray) -> tuple:
   x1 = 0
@@ -20,9 +13,9 @@ def get_extends(position: np.ndarray, time: np.ndarray) -> tuple:
   extents = [x1, x2, t1, t2]
 
 def read_stats(file_name_prefix: str):
-  position_file = open(f"./{file_name_prefix}_position", "r")
-  velocity_file = open(f"./{file_name_prefix}_velocity", "r")
-  time_file = open(f"./{file_name_prefix}_time", "r")
+  position_file = open(f"./{file_name_prefix}/position", "r")
+  velocity_file = open(f"./{file_name_prefix}/velocity", "r")
+  time_file = open(f"./{file_name_prefix}/time", "r")
 
   position = np.loadtxt(position_file, dtype=int)
   velocity = np.loadtxt(velocity_file, dtype=int)
@@ -61,16 +54,48 @@ def draw_plots(position: np.ndarray, velocity: np.ndarray, time: np.ndarray, par
   plt.tight_layout()
   plt.savefig(output_prefix + "_plots.png", dpi=300)
 
-def main() -> int:
-  # config_file_path = "./src/main/resources/config-184"
-  config_file_path = "./src/main/resources/config"
+def determine_varying_parameter(configs: list) -> str:
+  # only one parameter should vary
+  # if configs length is 1 -> so no varying parameter
+  if len(configs) == 1:
+    return None
+
+  # find the parameter that varies
+  varying_param = None
+  for key in configs[0].__dict__.keys():
+    if key in KEYS_TO_IGNORE:
+      continue
+    values = [getattr(c, key) for c in configs]
+    if len(set(values)) > 1:
+      if varying_param is not None:
+        raise ValueError("More than one parameter varies")
+      varying_param = key
+  if varying_param is None:
+    raise ValueError("No varying parameter found")
+  return varying_param
+
+def main(args) -> int:
+  # plan:
+  # 1. read config file (done)
+  # 2. parse configs based on files names inside outputFilePrefix dir (done)
+  # 3. determine varying (param that changes) parameter based on configs (done)
+  # 4. read stats files
+  # 5. draw all plots
+  # 6. save plots to outputFilePrefix + "/plots/" + "_plots.png"
+  config_file_path = args[1] if len(args) > 1 else "./src/main/resources/acceleration-based-config"
   configs = read_config(config_file_path)
+  configs.sort()
   print(configs)
 
-  position, velocity, time = read_stats(configs["outputFilePrefix"])
+  delta = determine_varying_parameter(configs)
+  print(f"Varying parameter: {delta}")
+# determine varying parameter as delta
 
-  draw_plots(position, velocity, time, configs)
+  # position, velocity, time = read_stats(configs["outputFilePrefix"])
+
+  # draw_plots(position, velocity, time, configs)
   pass
 
 if __name__ == '__main__':
-  main()
+  import sys
+  main(sys.argv)

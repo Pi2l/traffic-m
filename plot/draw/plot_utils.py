@@ -11,16 +11,16 @@ def draw_space_time_diagram(position, velocity, time, output_prefix, params: Con
   figure.set_size_inches(16, 8)
 
   figure.suptitle(f"Config params:\n{params.get_short_description()}")
-  extends_position = get_extends(position, time)
+  extents_position = get_extents(position, time)
 
-  extends_velocity = get_extends(velocity, time)
-  im1 = ax1.imshow(velocity, extent=extends_velocity, origin='lower', aspect='auto', cmap='coolwarm')
+  extents_velocity = get_extents(velocity, time)
+  im1 = ax1.imshow(velocity, extent=extents_velocity, origin='lower', aspect='auto', cmap='coolwarm')
   plt.colorbar(im1, ax=ax1, orientation='vertical')
   ax1.set_title("Vehicle velocity")
   ax1.set_xlabel("Position")
   ax1.set_ylabel("Time")
 
-  im2 = ax2.imshow(position, extent=extends_position, origin='lower', aspect='auto')
+  im2 = ax2.imshow(position, extent=extents_position, origin='lower', aspect='auto')
   plt.colorbar(im2, ax=ax2, orientation='vertical')
   ax2.set_title("Vehicle position")
   ax2.set_xlabel("Position")
@@ -29,7 +29,32 @@ def draw_space_time_diagram(position, velocity, time, output_prefix, params: Con
   plt.tight_layout()
   save_plot_as_png(plt, output_prefix, "space-time-diagram")
 
-def get_extends(position: np.ndarray, time: np.ndarray) -> tuple:
+# number of iteration vs global flow. TODO: Can be combined for multiple configs
+def time_global_flow(time: np.ndarray, flow: np.ndarray, config: Config, skip_fraction: float = 0.001) -> None:
+  figure = plt.figure()
+  figure.set_size_inches(8, 6)
+  figure.suptitle(f"Config params:\n{config.get_short_description()}")
+
+  time_copy = np.copy(time)
+  flow_copy = np.copy(flow)
+
+  # skip initialisation phase: first iteration
+  time_copy = time_copy[int(len(time_copy) * skip_fraction):]
+  flow_copy = flow_copy[int(len(flow_copy) * skip_fraction):]
+
+  time_vs_flow = np.stack((time_copy, flow_copy))
+  # skip 0 at lower and 99 at upper percentiles
+  lower, upper = np.percentile(flow_copy, [0, 99])
+
+  plt.scatter(time_vs_flow[0], time_vs_flow[1], c='blue', s=1)
+  plt.ylim(lower, upper)
+  plt.title("Global flow over time")
+  plt.xlabel("Time")
+  plt.ylabel("Global flow")
+  plt.tight_layout()
+  save_plot_as_png(plt, config.outputFilePrefix, "time-global-flow")
+
+def get_extents(position: np.ndarray, time: np.ndarray) -> tuple:
   x1 = 0
   x2 = position.shape[0] - 1
   t1 = 0

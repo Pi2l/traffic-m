@@ -3,13 +3,14 @@ import numpy as np
 from config.config_utils import read_config
 from config.config_base import Config
 from stats.stats_reader import read_stats
-
+from draw.plot_utils import draw_space_time_diagram, time_global_flow
 
 def draw_separate_plots(configs_with_stats: dict[Config, set]) -> None:
-  from draw.plot_utils import draw_space_time_diagram
+
   for config, stats in configs_with_stats.items():
     position, velocity, time, average_speed, density, flow = stats
     draw_space_time_diagram(position, velocity, time, config.outputFilePrefix, config)
+    time_global_flow(time, flow, config)
 
 def draw_combined_plots(configs_with_stats: dict[Config, set], delta: str) -> None:
   # TODO: draw combined plots based on varying parameter delta

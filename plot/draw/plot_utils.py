@@ -62,6 +62,22 @@ def get_extents(position: np.ndarray, time: np.ndarray) -> tuple:
   extents = [x1, x2, t1, t2]
   return extents
 
+# this diagram can be created only when we have varying density (N changing)
+# density is collection of last density values from each iteration; 
+# average_speed is collection of last average speed values from each iteration
+def density_average_speed(density: np.ndarray, average_speed: np.ndarray, config: Config) -> None:
+  figure = plt.figure()
+  figure.set_size_inches(8, 6)
+  figure.suptitle(f"Config params:\n{config.get_short_description()}")
+
+  plt.scatter(density, average_speed, c='blue', s=3)
+  plt.plot(density, average_speed, color='red', linewidth=1)  # draw line thru points
+  plt.title("Density vs Average Speed")
+  plt.xlabel("Density")
+  plt.ylabel("Average Speed")
+  plt.tight_layout()
+  save_plot_as_png(plt, config.outputFilePrefix, "density-average-speed")
+
 def save_plot_as_png(plt, output_prefix: str, file_name: str, dpi: int = 300) -> None:
   import os
 

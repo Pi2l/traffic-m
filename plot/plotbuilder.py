@@ -3,14 +3,21 @@ import numpy as np
 from config.config_utils import read_config
 from config.config_base import Config
 from stats.stats_reader import read_stats
-from draw.plot_utils import draw_space_time_diagram, time_global_flow
+from draw.plot_utils import draw_space_time_diagram, time_global_flow, density_average_speed
 
-def draw_separate_plots(configs_with_stats: dict[Config, set]) -> None:
+def draw_separate_plots(configs_with_stats: dict[Config, set], delta_param: str) -> None:
 
+  densities_per_config = []
+  average_speeds_per_config = []
   for config, stats in configs_with_stats.items():
     position, velocity, time, average_speed, density, flow = stats
     draw_space_time_diagram(position, velocity, time, config.outputFilePrefix, config)
     time_global_flow(time, flow, config)
+    densities_per_config.append(density[-1])
+    average_speeds_per_config.append(average_speed[-1])
+
+  if delta_param == 'roadLength' or delta_param == 'carCount':
+    density_average_speed(np.array(densities_per_config), np.array(average_speeds_per_config), config)
 
 def draw_combined_plots(configs_with_stats: dict[Config, set], delta: str) -> None:
   # TODO: draw combined plots based on varying parameter delta
@@ -64,7 +71,7 @@ def main(args) -> int:
     position, velocity, time, average_speed, density, flow = read_stats(config.outputFilePrefix)
     configs_with_stats[config] = (position, velocity, time, average_speed, density, flow)
 
-  draw_separate_plots(configs_with_stats)
+  draw_separate_plots(configs_with_stats, delta)
   # draw_combined_plots(configs_with_stats, delta)
   pass
 

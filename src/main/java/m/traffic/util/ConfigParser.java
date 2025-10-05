@@ -18,14 +18,14 @@ import m.traffic.core.data.config.SimulationConfig;
 import m.traffic.core.model.type.ModelType;
 
 enum OptionType {
-  CAR_NUMBER("car", "deltaCarNumber"), //format: min:max:delta
+  CAR_NUMBER("n", "deltaCarNumber"), //format: min:max:delta
   ROAD_LENGTH("l", "deltaRoadLength"), //format: min:max:delta
   MAX_SPEED("s", "deltaMaxSpeed"), //format: min:max:delta
   BRAKING_PROBABILITY("b", "deltaBrakingProbability"),
   P0_PROBABILITY("p0", "deltaP0Probability"),
   LOW_SPEED_THRESHOLD("t", "deltaLowSpeedThreshold"),
   LOW_SPEED_THRESHOLD_BRAKING_PROBABILITY("tp", "deltaLowSpeedThresholdBrakingProbability"),
-  STEP_COUNT("n", "stepCount"),
+  STEP_COUNT("i", "stepCount"), //i stands for iterations
   CONFIG_FILE("c", "configFile");
 
   String shortName;

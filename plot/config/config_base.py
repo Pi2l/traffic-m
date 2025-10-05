@@ -4,6 +4,8 @@ from config.model_type import ModelType
 
 
 class Config:
+  KEYS_TO_IGNORE = {"outputFilePrefix", "isCyclic", "stepDuration"}
+
   def __init__(self):
     self.roadLength = 0
     self.carCount = 0
@@ -49,6 +51,17 @@ class Config:
       
     else:
       raise ValueError(f"Unknown config key: {key}")
+
+  def get_short_description(self) -> str:
+    description = ""
+    general_description = f"L={self.roadLength}, N={self.carCount}, Vmax={self.maxSpeed}, p={self.brakingProbability}"
+
+    if self.modelType == ModelType.CELLULAR_AUTOMATON:
+      description += f"CA: {general_description}"
+    elif self.modelType == ModelType.ACCELERATION_BASED_MODEL:
+      description += (f"ABM: {general_description}, "
+                     f"p0={self.startAccelerationProbability}, LST={self.lowSpeedThreshold}, pLST={self.lowSpeedThresholdBrakingProbability}")
+    return description
 
   def __str__(self):
     return (f"Config(roadLength={self.roadLength}, carCount={self.carCount}, maxSpeed={self.maxSpeed}, "

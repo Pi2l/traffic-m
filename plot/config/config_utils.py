@@ -58,7 +58,9 @@ def read_config(config_path: str) -> list[Config]:
     simulation_result_dir = os.path.join(dir_name, simulation_result_dir_str)
     if not os.path.isdir(simulation_result_dir):
       continue
-    configs.append(parse_config_from_filename(default_config, simulation_result_dir_str))
+    config = parse_config_from_filename(default_config, simulation_result_dir_str)
+    config.outputFilePrefix = simulation_result_dir
+    configs.append(config)
     print(f"Parsed config from dir name: {simulation_result_dir_str} -> {configs[-1]}")
   return configs
 

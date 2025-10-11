@@ -5,7 +5,7 @@ from config.config_base import Config, ConfigOptionMap
 from stats.stats_reader import read_stats
 from draw.plot_utils import draw_space_time_diagram, density_flow, time_global_flow, density_average_speed
 
-def draw_separate_plots(configs_with_stats: dict[Config, set], delta_param: ConfigOptionMap) -> None:
+def draw_separate_plots(configs_with_stats: dict[Config, set], default_config: Config, delta_param: ConfigOptionMap) -> None:
 
   densities_per_config = []
   average_speeds_per_config = []
@@ -22,8 +22,8 @@ def draw_separate_plots(configs_with_stats: dict[Config, set], delta_param: Conf
 
   # plots based on delta rho (that is varying density)
   if delta_param == ConfigOptionMap.ROAD_LENGTH or delta_param == ConfigOptionMap.CAR_COUNT:
-    density_average_speed(np.array(densities_per_config), np.array(average_speeds_per_config), config, delta_param)
-    density_flow(np.array(densities_per_config), np.array(flows_per_config), config, delta_param)
+    density_average_speed(np.array(densities_per_config), np.array(average_speeds_per_config), default_config, delta_param)
+    density_flow(np.array(densities_per_config), np.array(flows_per_config), default_config, delta_param)
 
 def draw_combined_plots(configs_with_stats: dict[Config, set], delta: ConfigOptionMap) -> None:
   # TODO: draw combined plots based on varying parameter delta
@@ -66,7 +66,7 @@ def main(args) -> int:
   #   b. combined plots for all configs based on varying parameter
   # 6. save plots to outputFilePrefix + "/plots/" + "_plots.png"
   config_file_path = args[1] if len(args) > 1 else "./src/main/resources/acceleration-based-config"
-  configs = read_config(config_file_path)
+  configs, default_config = read_config(config_file_path)
   configs.sort()
   print(configs)
 
@@ -78,7 +78,7 @@ def main(args) -> int:
     position, velocity, time, average_speed, density, flow = read_stats(config.outputFilePrefix)
     configs_with_stats[config] = (position, velocity, time, average_speed, density, flow)
 
-  draw_separate_plots(configs_with_stats, delta)
+  draw_separate_plots(configs_with_stats, default_config, delta)
   # draw_combined_plots(configs_with_stats, delta)
   pass
 

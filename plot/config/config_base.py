@@ -3,6 +3,36 @@ from enum import StrEnum
 from config.model_type import ModelType
 
 
+class ConfigOptionMap(StrEnum):
+  # ab_L=1000_N=200_Vmax=5_p=0.33p0=0.70_LST=2_pLST=0.20
+  ROAD_LENGTH = "L"
+  CAR_COUNT = "N"
+  MAX_SPEED = "Vmax"
+  BRAKING_PROBABILITY = "p"
+  P0_PROBABILITY = "p0"
+  LOW_SPEED_THRESHOLD = "LST"
+  P_LOW_SPEED_THRESHOLD = "pLST"
+
+  @classmethod
+  def get_value_of_mapping(cls):
+    return {
+      "roadLength": cls.ROAD_LENGTH,
+      "carCount": cls.CAR_COUNT,
+      "maxSpeed": cls.MAX_SPEED,
+      "brakingProbability": cls.BRAKING_PROBABILITY,
+      "startAccelerationProbability": cls.P0_PROBABILITY,
+      "lowSpeedThreshold": cls.LOW_SPEED_THRESHOLD,
+      "lowSpeedThresholdBrakingProbability": cls.P_LOW_SPEED_THRESHOLD,
+    }
+
+  @classmethod
+  def from_field_name(cls, field_name: str):
+    value_of = cls.get_value_of_mapping()
+    if field_name in value_of:
+      return value_of[field_name]
+    else:
+      raise ValueError(f"Unknown field name: {field_name}")
+
 class Config:
   KEYS_TO_IGNORE = {"outputFilePrefix", "isCyclic", "stepDuration"}
 
@@ -52,15 +82,31 @@ class Config:
     else:
       raise ValueError(f"Unknown config key: {key}")
 
-  def get_short_description(self) -> str:
-    description = ""
-    general_description = f"L={self.roadLength}, N={self.carCount}, Vmax={self.maxSpeed}, p={self.brakingProbability}"
+  def get_short_description(self, varying_param: ConfigOptionMap = None) -> str:
+    # varying_param should be ignored
+    description_parts = []
+    if varying_param != ConfigOptionMap.ROAD_LENGTH:
+      description_parts.append(f"L={self.roadLength}")
+    if varying_param != ConfigOptionMap.CAR_COUNT:
+      description_parts.append(f"N={self.carCount}")
+    if varying_param != ConfigOptionMap.MAX_SPEED:
+      description_parts.append(f"Vmax={self.maxSpeed}")
+    if varying_param != ConfigOptionMap.BRAKING_PROBABILITY:
+      description_parts.append(f"p={self.brakingProbability}")
 
     if self.modelType == ModelType.CELLULAR_AUTOMATON:
-      description += f"CA: {general_description}"
+      general_description = ", ".join(description_parts)
+      description = f"CA: {general_description}"
     elif self.modelType == ModelType.ACCELERATION_BASED_MODEL:
-      description += (f"ABM: {general_description}, "
-                     f"p0={self.startAccelerationProbability}, LST={self.lowSpeedThreshold}, pLST={self.lowSpeedThresholdBrakingProbability}")
+      if varying_param != ConfigOptionMap.P0_PROBABILITY:
+        description_parts.append(f"p0={self.startAccelerationProbability}")
+      if varying_param != ConfigOptionMap.LOW_SPEED_THRESHOLD:
+        description_parts.append(f"LST={self.lowSpeedThreshold}")
+      if varying_param != ConfigOptionMap.P_LOW_SPEED_THRESHOLD:
+        description_parts.append(f"pLST={self.lowSpeedThresholdBrakingProbability}")
+
+      general_description = ", ".join(description_parts)
+      description = (f"ABM: {general_description}")
     return description
 
   def __str__(self):
@@ -90,13 +136,3 @@ class Config:
     if self.lowSpeedThresholdBrakingProbability != other.lowSpeedThresholdBrakingProbability:
       return self.lowSpeedThresholdBrakingProbability < other.lowSpeedThresholdBrakingProbability
     return False
-
-class ConfigOptionMap(StrEnum):
-  # ab_L=1000_N=200_Vmax=5_p=0.33p0=0.70_LST=2_pLST=0.20
-  ROAD_LENGTH = "L"
-  CAR_COUNT = "N"
-  MAX_SPEED = "Vmax"
-  BRAKING_PROBABILITY = "p"
-  P0_PROBABILITY = "p0"
-  LOW_SPEED_THRESHOLD = "LST"
-  P_LOW_SPEED_THRESHOLD = "pLST"

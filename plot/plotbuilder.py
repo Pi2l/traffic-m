@@ -1,11 +1,11 @@
 import numpy as np
 
 from config.config_utils import read_config
-from config.config_base import Config
+from config.config_base import Config, ConfigOptionMap
 from stats.stats_reader import read_stats
-from draw.plot_utils import draw_space_time_diagram, flow_density, time_global_flow, density_average_speed
+from draw.plot_utils import draw_space_time_diagram, density_flow, time_global_flow, density_average_speed
 
-def draw_separate_plots(configs_with_stats: dict[Config, set], delta_param: str) -> None:
+def draw_separate_plots(configs_with_stats: dict[Config, set], delta_param: ConfigOptionMap) -> None:
 
   densities_per_config = []
   average_speeds_per_config = []
@@ -21,11 +21,11 @@ def draw_separate_plots(configs_with_stats: dict[Config, set], delta_param: str)
     flows_per_config.append(flow[-1])
 
   # plots based on delta rho (that is varying density)
-  if delta_param == 'roadLength' or delta_param == 'carCount':
-    density_average_speed(np.array(densities_per_config), np.array(average_speeds_per_config), config)
-    flow_density(np.array(flows_per_config), np.array(densities_per_config), config)
+  if delta_param == ConfigOptionMap.ROAD_LENGTH or delta_param == ConfigOptionMap.CAR_COUNT:
+    density_average_speed(np.array(densities_per_config), np.array(average_speeds_per_config), config, delta_param)
+    density_flow(np.array(densities_per_config), np.array(flows_per_config), config, delta_param)
 
-def draw_combined_plots(configs_with_stats: dict[Config, set], delta: str) -> None:
+def draw_combined_plots(configs_with_stats: dict[Config, set], delta: ConfigOptionMap) -> None:
   # TODO: draw combined plots based on varying parameter delta
   # e.g. if delta is brakingProbability, then draw average speed vs brakingProbability for all configs
   # from plot.draw.plot_utils import draw_space_time_diagram
@@ -34,7 +34,7 @@ def draw_combined_plots(configs_with_stats: dict[Config, set], delta: str) -> No
   #   draw_space_time_diagram(position, velocity, time, config.outputFilePrefix)
   pass
 
-def determine_varying_parameter(configs: list) -> str:
+def determine_varying_parameter(configs: list) -> ConfigOptionMap:
   # only one parameter should vary
   # if configs length is 1 -> so no varying parameter
   if len(configs) == 1:
@@ -52,6 +52,7 @@ def determine_varying_parameter(configs: list) -> str:
       varying_param = key
   if varying_param is None:
     raise ValueError("No varying parameter found")
+  varying_param = ConfigOptionMap.from_field_name(varying_param)
   return varying_param
 
 def main(args) -> int:

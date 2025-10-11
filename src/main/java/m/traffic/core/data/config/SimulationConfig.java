@@ -10,6 +10,7 @@ import m.traffic.core.model.type.ModelType;
 @AllArgsConstructor
 public class SimulationConfig {
   public static final int INFINITE_STEP_COUNT = -1;
+  public static final int NO_STEP_DURATION = 0;
 
   private int roadLength;
   private int carCount;

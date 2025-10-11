@@ -45,6 +45,13 @@ public class SimulationEngine {
   }
 
   private void sleepSimulation(SimulationConfig config) {
+    if (config.getStepDuration() == SimulationConfig.NO_STEP_DURATION) {
+      return;
+    }
+    if (config.getStepDuration() < 0) {
+      throw new IllegalArgumentException("Step duration cannot be negative");
+    }
+
     try {
       Thread.sleep(config.getStepDuration());
     } catch (InterruptedException e) {

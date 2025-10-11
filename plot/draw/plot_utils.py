@@ -66,6 +66,7 @@ def get_extents(position: np.ndarray, time: np.ndarray) -> tuple:
 # density is collection of last density values from each iteration; 
 # average_speed is collection of last average speed values from each iteration
 def density_average_speed(density: np.ndarray, average_speed: np.ndarray, config: Config) -> None:
+  """ density vs average speed diagram """
   figure = plt.figure()
   figure.set_size_inches(8, 6)
   figure.suptitle(f"Config params:\n{config.get_short_description()}")
@@ -88,3 +89,17 @@ def save_plot_as_png(plt, output_prefix: str, file_name: str, dpi: int = 300) ->
   plt.savefig(os.path.join(dir_to_save, file_name) + '.png', dpi=dpi)
   print(f"Plot saved to {os.path.join(dir_to_save, file_name)}.png")
   plt.close()
+
+def flow_density(flow: np.ndarray, density: np.ndarray, config: Config) -> None:
+  """ flow vs density diagram """
+  figure = plt.figure()
+  figure.set_size_inches(8, 6)
+  figure.suptitle(f"Config params:\n{config.get_short_description()}")
+
+  plt.scatter(density, flow, c='blue', s=3)
+  plt.plot(density, flow, color='red', linewidth=1)
+  plt.title("Flow vs Density")
+  plt.xlabel("Density")
+  plt.ylabel("Flow")
+  plt.tight_layout()
+  save_plot_as_png(plt, config.outputFilePrefix, "flow-density")

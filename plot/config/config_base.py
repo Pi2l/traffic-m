@@ -90,27 +90,29 @@ class Config:
     else:
       raise ValueError(f"Unknown config key: {key}")
 
-  def get_short_description(self, varying_param: ConfigOptionMap = None) -> str:
+  def get_short_description(self, varying_params: list[ConfigOptionMap] = None) -> str:
+    if varying_params is None:
+      varying_params = []
     # varying_param should be ignored
     description_parts = []
-    if varying_param != ConfigOptionMap.ROAD_LENGTH:
+    if ConfigOptionMap.ROAD_LENGTH not in varying_params:
       description_parts.append(f"L={self.roadLength}")
-    if varying_param != ConfigOptionMap.CAR_COUNT:
+    if ConfigOptionMap.CAR_COUNT not in varying_params:
       description_parts.append(f"N={self.carCount}")
-    if varying_param != ConfigOptionMap.MAX_SPEED:
+    if ConfigOptionMap.MAX_SPEED not in varying_params:
       description_parts.append(f"Vmax={self.maxSpeed}")
-    if varying_param != ConfigOptionMap.BRAKING_PROBABILITY:
+    if ConfigOptionMap.BRAKING_PROBABILITY not in varying_params:
       description_parts.append(f"p={self.brakingProbability}")
 
     if self.modelType == ModelType.CELLULAR_AUTOMATON:
       general_description = ", ".join(description_parts)
       description = f"CA: {general_description}"
     elif self.modelType == ModelType.ACCELERATION_BASED_MODEL:
-      if varying_param != ConfigOptionMap.P0_PROBABILITY:
+      if ConfigOptionMap.P0_PROBABILITY not in varying_params:
         description_parts.append(f"p0={self.startAccelerationProbability}")
-      if varying_param != ConfigOptionMap.LOW_SPEED_THRESHOLD:
+      if ConfigOptionMap.LOW_SPEED_THRESHOLD not in varying_params:
         description_parts.append(f"LST={self.lowSpeedThreshold}")
-      if varying_param != ConfigOptionMap.P_LOW_SPEED_THRESHOLD:
+      if ConfigOptionMap.P_LOW_SPEED_THRESHOLD not in varying_params:
         description_parts.append(f"pLST={self.lowSpeedThresholdBrakingProbability}")
 
       general_description = ", ".join(description_parts)

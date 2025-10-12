@@ -28,36 +28,50 @@ def draw_separate_plots(configs_with_stats: dict[Config, set], default_config: C
     density_average_speed(np.array(densities_per_config), np.array(average_speeds_per_config), default_config, delta_param)
     density_flow(np.array(densities_per_config), np.array(flows_per_config), default_config, delta_param)
 
-def draw_combined_plots(configs_with_stats: dict[Config, set], default_config: Config, delta: ConfigOptionMap) -> None:
-  # TODO: draw combined plots based on varying parameter delta
-  # e.g. if delta is brakingProbability, then draw average speed vs brakingProbability for all configs
-  # can be done only when delta is changing density (road length or car count)
+def draw_combined_plots(grouped_configs: dict[tuple[str, int | float], list[Config]],
+                        default_config: Config,
+                        configs_with_stats: dict[Config, set]) -> None:
 
-  # then all configs should be plotted on same diagram
-  # plan:
-  # 1. form array of densities, average speeds and flows per config
-  # 2. draw density vs average speed
-  # 3. draw density vs flow
-  # 4. save plots to default_config.outputFilePrefix + "/plots/delta_" + delta.name + "_plots.png"
-  # if delta not in [ConfigOptionMap.ROAD_LENGTH, ConfigOptionMap.CAR_COUNT]:
-  #   print("Combined plots cannot be drawn when delta is not ROAD_LENGTH or CAR_COUNT")
-  #   return
+  densities_per_group = []
+  average_speeds_per_group = []
+  flows_per_group = []
+  deltas_names_per_group: set[str] = set()
+  deltas_per_group: list[tuple[str, int | float]] = []
+  delta = None
 
-  # densities_per_config = list([])
-  # average_speeds_per_config = list([])
-  # flows_per_config = list([])
+  for group_key, group_configs in grouped_configs.items():
+    group_configs_with_stats = {config: configs_with_stats[config] for config in group_configs}
+    delta = determine_varying_parameter(group_configs)
+    if delta not in [ConfigOptionMap.ROAD_LENGTH, ConfigOptionMap.CAR_COUNT]:
+      print("Combined plots cannot be drawn when delta is not ROAD_LENGTH or CAR_COUNT")
+      continue
+    
+    densities_per_config = []
+    average_speeds_per_config = []
+    flows_per_config = []
+    for _, stats in group_configs_with_stats.items():
+      _, _, _, average_speed, density, flow = stats
 
-  # for _, stats in configs_with_stats.items():
-  #   average_speed, density, flow = stats
-  #   densities_per_config.append(density[-1])
-  #   average_speeds_per_config.append(average_speed[-1])
-  #   flows_per_config.append(flow[-1])
+      densities_per_config.append(density[-1])
+      average_speeds_per_config.append(average_speed[-1])
+      flows_per_config.append(flow[-1])
 
-  # densities_per_config is list of arrays, each array is density for each config; same for average_speeds_per_config and flows_per_config
-  # now we need to flatten these arrays into single array for each metric
-  # density_average_speed_all_in_one(np.array(densities_per_config), np.array(average_speeds_per_config), default_config)
-  # density_flow_all_in_one(np.array(densities_per_config), np.array(flows_per_config), default_config, delta_param)
+    densities_per_group.append(densities_per_config)
+    average_speeds_per_group.append(average_speeds_per_config)
+    flows_per_group.append(flows_per_config)
+    deltas_names_per_group.add(group_key[0])
+    deltas_per_group.append(group_key)
   
+  if len(deltas_names_per_group) > 1:
+    print("Combined plots cannot be drawn when more than one delta is present")
+    return
+
+  density_average_speed_all_in_one(np.array(densities_per_group),
+                                   np.array(average_speeds_per_group),
+                                   default_config,
+                                   deltas_per_group,
+                                   delta)
+  # density_flow_all_in_one(np.array(densities_per_group), np.array(flows_per_group), default_config, delta_param)
   pass
 
 def determine_varying_parameter(configs: list[Config]) -> ConfigOptionMap | None:
@@ -122,10 +136,6 @@ def main() -> int:
   filtered_configs = parse_and_filter_configs(configs, args)
   print(f"Final filtered configs: {len(filtered_configs)}")
 
-# # can vary up to two parameters: one for --from and one for --select or only --from (then select part is not varying)
-#   delta = determine_varying_parameter(filtered_configs, args)
-  # print(f"Varying parameter: {delta}")
-
   if not filtered_configs:
     print("No configs match the specified criteria!")
     return 1
@@ -141,10 +151,12 @@ def main() -> int:
     delta = determine_varying_parameter(group_configs)
 
     config = copy.deepcopy(default_config)
-    config.outputFilePrefix += f"_{delta}_{group_key[0]}={str(group_key[1])}"  # append first key=value to outputFilePrefix
+    prefix = config.outputFilePrefix.split("/")[-1] # prefix
+    global_plots_dir = "/".join(config.outputFilePrefix.split("/")[:-1]) + "/global-plots"
+    config.outputFilePrefix = f"{global_plots_dir}/{prefix}_{delta}_{group_key[0]}={str(group_key[1])}"  # append first key=value to outputFilePrefix
     draw_separate_plots(group_configs_with_stats, config, delta)
 
-  # draw_combined_plots(configs_with_stats, default_config)
+  draw_combined_plots(grouped_configs, default_config, configs_with_stats)
   pass
 
 if __name__ == '__main__':

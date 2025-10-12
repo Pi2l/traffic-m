@@ -80,7 +80,7 @@ def density_average_speed(density: np.ndarray, average_speed: np.ndarray, config
   """ density vs average speed diagram """
   figure = plt.figure()
   figure.set_size_inches(8, 6)
-  figure.suptitle(f"Config params:\n{config.get_short_description(varying_param)}")
+  figure.suptitle(f"Config params:\n{config.get_short_description([varying_param])}")
 
   plt.scatter(density, average_speed, c='blue', s=3)
   plt.plot(density, average_speed, color='red', linewidth=1)  # draw line thru points
@@ -90,13 +90,23 @@ def density_average_speed(density: np.ndarray, average_speed: np.ndarray, config
   plt.tight_layout()
   save_plot_as_png(plt, config.outputFilePrefix, "density-average-speed")
 
-def density_average_speed_all_in_one(densities: np.ndarray, average_speeds: np.ndarray, config: Config, varying_param: ConfigOptionMap) -> None:
+def density_average_speed_all_in_one(densities: np.ndarray,
+                                     average_speeds: np.ndarray,
+                                     config: Config,
+                                     varying_param: list[tuple[str, int | float]],
+                                     delta: ConfigOptionMap
+                                    ) -> None:
   """ densities vs average speeds diagram for all configs in one plot"""
   figure = plt.figure()
   figure.set_size_inches(8, 6)
-  figure.suptitle(f"Config params:\n{config.get_short_description(varying_param)}")
+  deltas = [ConfigOptionMap.from_field_name(varying_param[0][0])]
+  if delta not in deltas:
+    deltas.append(delta)
+  figure.suptitle(f"Config params:\n{config.get_short_description(deltas)}")
 
-  plt.plot(densities, average_speeds, linewidth=1)  # draw line thru points
+  for i in range(len(densities)):
+    plt.plot(densities[i], average_speeds[i], linewidth=1, label=f"{varying_param[i][0]}={varying_param[i][1]}")
+  plt.legend()
   plt.title("Densities vs Average Speeds (all in one)")
   plt.xlabel("Density")
   plt.ylabel("Average Speed")
@@ -107,7 +117,7 @@ def density_flow(density: np.ndarray, flow: np.ndarray, config: Config, varying_
   """ density vs flow diagram """
   figure = plt.figure()
   figure.set_size_inches(8, 6)
-  figure.suptitle(f"Config params:\n{config.get_short_description(varying_param)}")
+  figure.suptitle(f"Config params:\n{config.get_short_description([varying_param])}")
 
   plt.scatter(density, flow, c='blue', s=3)
   plt.plot(density, flow, color='red', linewidth=1)

@@ -1,11 +1,12 @@
 import argparse
+import copy
 import numpy as np
 
 from config.args_parser import get_args, parse_and_filter_configs, parse_secondary_filters
 from config.config_utils import read_all_configs
 from config.config_base import Config, ConfigOptionMap
 from stats.stats_reader import read_stats
-from draw.plot_utils import density_average_speed_all_in_one, draw_space_time_diagram, density_flow, time_global_flow, density_average_speed
+from draw.plot_utils import density_average_speed_all_in_one, draw_space_time_diagram, density_flow, iterations_global_flow, density_average_speed
 
 def draw_separate_plots(configs_with_stats: dict[Config, set], default_config: Config, delta_param: ConfigOptionMap) -> None:
 
@@ -16,7 +17,7 @@ def draw_separate_plots(configs_with_stats: dict[Config, set], default_config: C
   for config, stats in configs_with_stats.items():
     position, velocity, time, average_speed, density, flow = stats
     draw_space_time_diagram(position, velocity, time, config.outputFilePrefix, config)
-    time_global_flow(time, flow, config)
+    iterations_global_flow(time, flow, config)
 
     densities_per_config.append(density[-1])
     average_speeds_per_config.append(average_speed[-1])
@@ -59,7 +60,7 @@ def draw_combined_plots(configs_with_stats: dict[Config, set], default_config: C
   
   pass
 
-def determine_varying_parameter(configs: list[Config], args: argparse.Namespace) -> ConfigOptionMap | None:
+def determine_varying_parameter(configs: list[Config]) -> ConfigOptionMap | None:
   # only one parameter should vary
   # if configs length is 1 -> so no varying parameter
   if len(configs) == 1:
@@ -80,9 +81,9 @@ def determine_varying_parameter(configs: list[Config], args: argparse.Namespace)
   varying_param = ConfigOptionMap.from_field_name(varying_param)
   return varying_param
 
-def get_grouped_configs(configs_with_stats: dict[Config, set], args: argparse.Namespace) -> dict[tuple, list[Config]]:
+def get_grouped_configs(configs_with_stats: dict[Config, set], args: argparse.Namespace) -> dict[tuple[str, int | float], list[Config]]:
   # group configs by --select parameters
-  grouped_configs = dict[tuple, list[Config]]()
+  grouped_configs = dict[tuple[str, int | float], list[Config]]()
   select_filters = parse_secondary_filters(args)
   select_keys = list(select_filters.keys())
   
@@ -90,6 +91,7 @@ def get_grouped_configs(configs_with_stats: dict[Config, set], args: argparse.Na
     group_key = []
     for key in select_keys:
       field_name = key.to_field_name(key)
+      group_key.append(field_name)
       group_key.append(getattr(config, field_name))
     group_key = tuple(group_key)
     if group_key not in grouped_configs:
@@ -114,7 +116,8 @@ def main() -> int:
   configs, default_config = read_all_configs(args.config_file)
   configs.sort()
   print(f"Total configs found: {len(configs)}")
-  print(configs)
+  for config in configs:
+    print(config)
 
   filtered_configs = parse_and_filter_configs(configs, args)
   print(f"Final filtered configs: {len(filtered_configs)}")
@@ -132,13 +135,14 @@ def main() -> int:
     position, velocity, time, average_speed, density, flow = read_stats(config.outputFilePrefix)
     configs_with_stats[config] = (position, velocity, time, average_speed, density, flow)
 
-#TODO: separate plots should be drawn for grouped by --select part
-  # draw_separate_plots(configs_with_stats, default_config, delta)
   grouped_configs = get_grouped_configs(configs_with_stats, args)
-  # for group_key, group_configs in grouped_configs.items():
-  #   group_configs_with_stats = {config: configs_with_stats[config] for config in group_configs}
-  #   delta = determine_varying_parameter(group_configs, args)
-  #   draw_separate_plots(group_configs_with_stats, default_config, delta)
+  for group_key, group_configs in grouped_configs.items():
+    group_configs_with_stats = {config: configs_with_stats[config] for config in group_configs}
+    delta = determine_varying_parameter(group_configs)
+
+    config = copy.deepcopy(default_config)
+    config.outputFilePrefix += f"_{delta}_{group_key[0]}={str(group_key[1])}"  # append first key=value to outputFilePrefix
+    draw_separate_plots(group_configs_with_stats, config, delta)
 
   # draw_combined_plots(configs_with_stats, default_config)
   pass

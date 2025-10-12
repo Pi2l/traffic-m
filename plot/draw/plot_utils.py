@@ -30,7 +30,7 @@ def draw_space_time_diagram(position, velocity, time, output_prefix, params: Con
   save_plot_as_png(plt, output_prefix, "space-time-diagram")
 
 # number of iteration vs global flow. TODO: Can be combined for multiple configs
-def time_global_flow(time: np.ndarray, flow: np.ndarray, config: Config, skip_fraction: float = 0.001) -> None:
+def iterations_global_flow(time: np.ndarray, flow: np.ndarray, config: Config, skip_fraction: float = 0.001) -> None:
   figure = plt.figure()
   figure.set_size_inches(8, 6)
   figure.suptitle(f"Config params:\n{config.get_short_description()}")
@@ -48,11 +48,11 @@ def time_global_flow(time: np.ndarray, flow: np.ndarray, config: Config, skip_fr
 
   plt.scatter(time_vs_flow[0], time_vs_flow[1], c='blue', s=1)
   plt.ylim(lower, upper)
-  plt.title("Global flow over time")
-  plt.xlabel("Time")
+  plt.title("Global flow over iterations")
+  plt.xlabel("Iterations")
   plt.ylabel("Global flow")
   plt.tight_layout()
-  save_plot_as_png(plt, config.outputFilePrefix, "time-global-flow")
+  save_plot_as_png(plt, config.outputFilePrefix, "iterations-global-flow")
 
 def get_extents(position: np.ndarray, time: np.ndarray) -> tuple:
   x1 = 0
@@ -89,6 +89,19 @@ def density_average_speed(density: np.ndarray, average_speed: np.ndarray, config
   plt.ylabel("Average Speed")
   plt.tight_layout()
   save_plot_as_png(plt, config.outputFilePrefix, "density-average-speed")
+
+def density_average_speed_all_in_one(densities: np.ndarray, average_speeds: np.ndarray, config: Config, varying_param: ConfigOptionMap) -> None:
+  """ densities vs average speeds diagram for all configs in one plot"""
+  figure = plt.figure()
+  figure.set_size_inches(8, 6)
+  figure.suptitle(f"Config params:\n{config.get_short_description(varying_param)}")
+
+  plt.plot(densities, average_speeds, linewidth=1)  # draw line thru points
+  plt.title("Densities vs Average Speeds (all in one)")
+  plt.xlabel("Density")
+  plt.ylabel("Average Speed")
+  plt.tight_layout()
+  save_plot_as_png(plt, config.outputFilePrefix, "density-average-speed-all-in-one")
 
 def density_flow(density: np.ndarray, flow: np.ndarray, config: Config, varying_param: ConfigOptionMap) -> None:
   """ density vs flow diagram """

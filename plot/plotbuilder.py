@@ -1,9 +1,11 @@
+import argparse
 import numpy as np
 
-from config.config_utils import read_config
+from config.args_parser import get_args, parse_and_filter_configs, parse_secondary_filters
+from config.config_utils import read_all_configs
 from config.config_base import Config, ConfigOptionMap
 from stats.stats_reader import read_stats
-from draw.plot_utils import draw_space_time_diagram, density_flow, time_global_flow, density_average_speed
+from draw.plot_utils import density_average_speed_all_in_one, draw_space_time_diagram, density_flow, time_global_flow, density_average_speed
 
 def draw_separate_plots(configs_with_stats: dict[Config, set], default_config: Config, delta_param: ConfigOptionMap) -> None:
 
@@ -25,16 +27,39 @@ def draw_separate_plots(configs_with_stats: dict[Config, set], default_config: C
     density_average_speed(np.array(densities_per_config), np.array(average_speeds_per_config), default_config, delta_param)
     density_flow(np.array(densities_per_config), np.array(flows_per_config), default_config, delta_param)
 
-def draw_combined_plots(configs_with_stats: dict[Config, set], delta: ConfigOptionMap) -> None:
+def draw_combined_plots(configs_with_stats: dict[Config, set], default_config: Config, delta: ConfigOptionMap) -> None:
   # TODO: draw combined plots based on varying parameter delta
   # e.g. if delta is brakingProbability, then draw average speed vs brakingProbability for all configs
-  # from plot.draw.plot_utils import draw_space_time_diagram
-  # for config, stats in configs_with_stats.items():
-  #   position, velocity, time, average_speed, density, flow = stats
-  #   draw_space_time_diagram(position, velocity, time, config.outputFilePrefix)
+  # can be done only when delta is changing density (road length or car count)
+
+  # then all configs should be plotted on same diagram
+  # plan:
+  # 1. form array of densities, average speeds and flows per config
+  # 2. draw density vs average speed
+  # 3. draw density vs flow
+  # 4. save plots to default_config.outputFilePrefix + "/plots/delta_" + delta.name + "_plots.png"
+  # if delta not in [ConfigOptionMap.ROAD_LENGTH, ConfigOptionMap.CAR_COUNT]:
+  #   print("Combined plots cannot be drawn when delta is not ROAD_LENGTH or CAR_COUNT")
+  #   return
+
+  # densities_per_config = list([])
+  # average_speeds_per_config = list([])
+  # flows_per_config = list([])
+
+  # for _, stats in configs_with_stats.items():
+  #   average_speed, density, flow = stats
+  #   densities_per_config.append(density[-1])
+  #   average_speeds_per_config.append(average_speed[-1])
+  #   flows_per_config.append(flow[-1])
+
+  # densities_per_config is list of arrays, each array is density for each config; same for average_speeds_per_config and flows_per_config
+  # now we need to flatten these arrays into single array for each metric
+  # density_average_speed_all_in_one(np.array(densities_per_config), np.array(average_speeds_per_config), default_config)
+  # density_flow_all_in_one(np.array(densities_per_config), np.array(flows_per_config), default_config, delta_param)
+  
   pass
 
-def determine_varying_parameter(configs: list) -> ConfigOptionMap:
+def determine_varying_parameter(configs: list[Config], args: argparse.Namespace) -> ConfigOptionMap | None:
   # only one parameter should vary
   # if configs length is 1 -> so no varying parameter
   if len(configs) == 1:
@@ -55,7 +80,26 @@ def determine_varying_parameter(configs: list) -> ConfigOptionMap:
   varying_param = ConfigOptionMap.from_field_name(varying_param)
   return varying_param
 
-def main(args) -> int:
+def get_grouped_configs(configs_with_stats: dict[Config, set], args: argparse.Namespace) -> dict[tuple, list[Config]]:
+  # group configs by --select parameters
+  grouped_configs = dict[tuple, list[Config]]()
+  select_filters = parse_secondary_filters(args)
+  select_keys = list(select_filters.keys())
+  
+  for config in configs_with_stats.keys():
+    group_key = []
+    for key in select_keys:
+      field_name = key.to_field_name(key)
+      group_key.append(getattr(config, field_name))
+    group_key = tuple(group_key)
+    if group_key not in grouped_configs:
+      grouped_configs[group_key] = []
+    grouped_configs[group_key].append(config)
+
+  return grouped_configs
+  
+
+def main() -> int:
   # plan:
   # 1. read config file (done)
   # 2. parse configs based on files names inside outputFilePrefix dir (done)
@@ -65,23 +109,40 @@ def main(args) -> int:
   #   a. separate plots for each config
   #   b. combined plots for all configs based on varying parameter
   # 6. save plots to outputFilePrefix + "/plots/" + "_plots.png"
-  config_file_path = args[1] if len(args) > 1 else "./src/main/resources/acceleration-based-config"
-  configs, default_config = read_config(config_file_path)
+
+  args = get_args()
+  configs, default_config = read_all_configs(args.config_file)
   configs.sort()
+  print(f"Total configs found: {len(configs)}")
   print(configs)
 
-  delta = determine_varying_parameter(configs)
-  print(f"Varying parameter: {delta}")
+  filtered_configs = parse_and_filter_configs(configs, args)
+  print(f"Final filtered configs: {len(filtered_configs)}")
+
+# # can vary up to two parameters: one for --from and one for --select or only --from (then select part is not varying)
+#   delta = determine_varying_parameter(filtered_configs, args)
+  # print(f"Varying parameter: {delta}")
+
+  if not filtered_configs:
+    print("No configs match the specified criteria!")
+    return 1
 
   configs_with_stats = dict[Config, set]()
-  for config in configs:
+  for config in filtered_configs:
     position, velocity, time, average_speed, density, flow = read_stats(config.outputFilePrefix)
     configs_with_stats[config] = (position, velocity, time, average_speed, density, flow)
 
-  draw_separate_plots(configs_with_stats, default_config, delta)
-  # draw_combined_plots(configs_with_stats, delta)
+#TODO: separate plots should be drawn for grouped by --select part
+  # draw_separate_plots(configs_with_stats, default_config, delta)
+  grouped_configs = get_grouped_configs(configs_with_stats, args)
+  # for group_key, group_configs in grouped_configs.items():
+  #   group_configs_with_stats = {config: configs_with_stats[config] for config in group_configs}
+  #   delta = determine_varying_parameter(group_configs, args)
+  #   draw_separate_plots(group_configs_with_stats, default_config, delta)
+
+  # draw_combined_plots(configs_with_stats, default_config)
   pass
 
 if __name__ == '__main__':
   import sys
-  main(sys.argv)
+  sys.exit(main())

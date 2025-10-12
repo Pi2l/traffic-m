@@ -44,7 +44,7 @@ def read_default_config_from_file(config_path: str) -> Config:
       config.setField(key.strip(), value.strip())
   return config
 
-def read_config(config_path: str) -> tuple[list[Config], Config]:
+def read_all_configs(config_path: str) -> tuple[list[Config], Config]:
   configs = list()
   # walk through each file under dir name
   # parse each file name to get config params
@@ -63,6 +63,14 @@ def read_config(config_path: str) -> tuple[list[Config], Config]:
     configs.append(config)
     print(f"Parsed config from dir name: {simulation_result_dir_str} -> {configs[-1]}")
   return configs, default_config
+
+def build_configs(configs: list[Config], param: str) -> list[Config]:
+  
+  pass
+
+def select_from_configs(configs: list[Config], option_map: ConfigOptionMap) -> list[Config]:
+  # select only configs by config option map
+  return [config for config in configs if config.has_option(option_map)]
 
 def build_dir_name_from_params(config: Config):
   prefix = config.outputFilePrefix.split("/")[-1]

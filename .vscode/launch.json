@@ -12,7 +12,7 @@
       "args": [
         "-c",
         "${input:config file}",
-        "${input:additional args}"
+        "-${input:config key}", "${input:arg value}",
       ]
     },
     {
@@ -20,7 +20,9 @@
       "request": "launch",
       "name": "Python: Plotbuilder",
       "args": [
-        "${input:config file}"
+        "-c", "${input:config file}",
+        "-${input:config key}", "${input:arg value}",
+        "--select-${input:select key}", "${input:select arg value}"
       ],
       "program": "./plot/plotbuilder.py",
     },
@@ -38,9 +40,45 @@
       "default": "acceleration-based-config"
     },
     {
-      "id": "additional args",
+      "id": "config key",
+      "type": "pickString",
+      "description": "select -n, -l, -v, -p, -s, -t, or -q argument\n n - car count\n l - road length\n v - max speed\n p - braking probability\n s - start acceleration probability\n t - low speed threshold\n q - low speed threshold braking probability",
+      "options": [
+        "l",
+        "n",
+        "v",
+        "p",
+        "s",
+        "t",
+        "q"
+      ],
+      "default": "n"
+    },
+    {
+      "id": "select key",
+      "type": "pickString",
+      "description": "select --select key argument",
+      "options": [
+        "road-length",
+        "car-count",
+        "max-speed",
+        "braking-probability",
+        "start-acceleration-probability",
+        "low-speed-threshold",
+        "low-speed-threshold-braking-probability"
+      ],
+      "default": "braking-probability"
+    },
+    {
+      "id": "arg value",
       "type": "promptString",
-      "description": "Input additional arguments (e.g., -l 3:10:1)",
+      "description": "Input arguments (e.g., 3:10:1)",
+      "default": ""
+    },
+    {
+      "id": "select arg value",
+      "type": "promptString",
+      "description": "Input select arguments (e.g., 3:10:1)",
       "default": ""
     }
   ]

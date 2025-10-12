@@ -20,11 +20,11 @@ import m.traffic.core.model.type.ModelType;
 enum OptionType {
   CAR_NUMBER("n", "deltaCarNumber"), //format: min:max:delta
   ROAD_LENGTH("l", "deltaRoadLength"), //format: min:max:delta
-  MAX_SPEED("s", "deltaMaxSpeed"), //format: min:max:delta
-  BRAKING_PROBABILITY("b", "deltaBrakingProbability"),
-  P0_PROBABILITY("p0", "deltaP0Probability"),
+  MAX_SPEED("v", "deltaMaxSpeed"), //format: min:max:delta
+  BRAKING_PROBABILITY("p", "deltaBrakingProbability"),
+  P0_PROBABILITY("s", "deltaP0Probability"),
   LOW_SPEED_THRESHOLD("t", "deltaLowSpeedThreshold"),
-  LOW_SPEED_THRESHOLD_BRAKING_PROBABILITY("tp", "deltaLowSpeedThresholdBrakingProbability"),
+  LOW_SPEED_THRESHOLD_BRAKING_PROBABILITY("q", "deltaLowSpeedThresholdBrakingProbability"),
   STEP_COUNT("i", "stepCount"), //i stands for iterations
   CONFIG_FILE("c", "configFile");
 

@@ -33,6 +33,14 @@ class ConfigOptionMap(StrEnum):
     else:
       raise ValueError(f"Unknown field name: {field_name}")
 
+  @classmethod
+  def to_field_name(cls, option_map: 'ConfigOptionMap'):
+    value_of = cls.get_value_of_mapping()
+    for field_name, mapping in value_of.items():
+      if mapping == option_map:
+        return field_name
+    raise ValueError(f"Unknown option map: {option_map}")
+
 class Config:
   KEYS_TO_IGNORE = {"outputFilePrefix", "isCyclic", "stepDuration"}
 

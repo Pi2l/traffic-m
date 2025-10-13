@@ -76,11 +76,11 @@ def save_plot_as_png(plt, output_prefix: str, file_name: str, dpi: int = 300) ->
 # this diagram can be created only when we have varying density (N changing)
 # density is collection of last density values from each iteration; 
 # average_speed is collection of last average speed values from each iteration
-def density_average_speed(density: np.ndarray, average_speed: np.ndarray, config: Config, varying_param: ConfigOptionMap) -> None:
+def density_average_speed(density: np.ndarray, average_speed: np.ndarray, config: Config, varying_param: list[ConfigOptionMap]) -> None:
   """ density vs average speed diagram """
   figure = plt.figure()
   figure.set_size_inches(8, 6)
-  figure.suptitle(f"Config params:\n{config.get_short_description([varying_param])}")
+  figure.suptitle(f"Config params:\n{config.get_short_description(varying_param)}")
 
   plt.scatter(density, average_speed, c='blue', s=3)
   plt.plot(density, average_speed, color='red', linewidth=1)  # draw line thru points
@@ -113,11 +113,11 @@ def density_average_speed_all_in_one(densities: np.ndarray,
   plt.tight_layout()
   save_plot_as_png(plt, config.outputFilePrefix, "density-average-speed-all-in-one")
 
-def density_flow(density: np.ndarray, flow: np.ndarray, config: Config, varying_param: ConfigOptionMap) -> None:
+def density_flow(density: np.ndarray, flow: np.ndarray, config: Config, varying_param: list[ConfigOptionMap]) -> None:
   """ density vs flow diagram """
   figure = plt.figure()
   figure.set_size_inches(8, 6)
-  figure.suptitle(f"Config params:\n{config.get_short_description([varying_param])}")
+  figure.suptitle(f"Config params:\n{config.get_short_description(varying_param)}")
 
   plt.scatter(density, flow, c='blue', s=3)
   plt.plot(density, flow, color='red', linewidth=1)

@@ -8,7 +8,7 @@ from config.config_base import Config, ConfigOptionMap
 from stats.stats_reader import read_stats
 from draw.plot_utils import density_average_speed_all_in_one, density_flow_all_in_one, draw_space_time_diagram, density_flow, iterations_global_flow, density_average_speed
 
-def draw_separate_plots(configs_with_stats: dict[Config, set], default_config: Config, delta_param: ConfigOptionMap) -> None:
+def draw_separate_plots(configs_with_stats: dict[Config, set], default_config: Config, delta_param: list[ConfigOptionMap]) -> None:
 
   densities_per_config = []
   average_speeds_per_config = []
@@ -24,7 +24,7 @@ def draw_separate_plots(configs_with_stats: dict[Config, set], default_config: C
     flows_per_config.append(flow[-1])
 
   # plots based on delta rho (that is varying density)
-  if delta_param == ConfigOptionMap.ROAD_LENGTH or delta_param == ConfigOptionMap.CAR_COUNT:
+  if ConfigOptionMap.ROAD_LENGTH in delta_param or ConfigOptionMap.CAR_COUNT in delta_param:
     density_average_speed(np.array(densities_per_config), np.array(average_speeds_per_config), default_config, delta_param)
     density_flow(np.array(densities_per_config), np.array(flows_per_config), default_config, delta_param)
 
@@ -167,7 +167,8 @@ def main() -> int:
 
     default_config_per_group = get_global_plot_dir(default_config)
     default_config_per_group.outputFilePrefix += f"_{delta}_{group_key[0]}={str(group_key[1])}"  # append first key=value to outputFilePrefix
-    draw_separate_plots(group_configs_with_stats, default_config_per_group, delta)
+    deltas = {ConfigOptionMap.from_field_name(group_key[0]), delta}
+    draw_separate_plots(group_configs_with_stats, default_config_per_group, list(deltas))
 
   config = get_global_plot_dir(default_config)
   draw_combined_plots(grouped_configs, config, configs_with_stats)

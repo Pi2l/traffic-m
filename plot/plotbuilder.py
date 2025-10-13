@@ -6,7 +6,7 @@ from config.args_parser import get_args, parse_and_filter_configs, parse_seconda
 from config.config_utils import read_all_configs
 from config.config_base import Config, ConfigOptionMap
 from stats.stats_reader import read_stats
-from draw.plot_utils import density_average_speed_all_in_one, draw_space_time_diagram, density_flow, iterations_global_flow, density_average_speed
+from draw.plot_utils import density_average_speed_all_in_one, density_flow_all_in_one, draw_space_time_diagram, density_flow, iterations_global_flow, density_average_speed
 
 def draw_separate_plots(configs_with_stats: dict[Config, set], default_config: Config, delta_param: ConfigOptionMap) -> None:
 
@@ -76,7 +76,11 @@ def draw_combined_plots(grouped_configs: dict[tuple[str, int | float], list[Conf
                                    config,
                                    deltas_per_group,
                                    delta)
-  # density_flow_all_in_one(np.array(densities_per_group), np.array(flows_per_group), default_config, delta_param)
+  density_flow_all_in_one(np.array(densities_per_group),
+                          np.array(flows_per_group),
+                          config,
+                          deltas_per_group,
+                          delta)
   pass
 
 def determine_varying_parameter(configs: list[Config]) -> ConfigOptionMap | None:

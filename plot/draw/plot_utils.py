@@ -126,3 +126,26 @@ def density_flow(density: np.ndarray, flow: np.ndarray, config: Config, varying_
   plt.ylabel("Flow")
   plt.tight_layout()
   save_plot_as_png(plt, config.outputFilePrefix, "density-flow")
+
+def density_flow_all_in_one(densities: np.ndarray,
+                            flows: np.ndarray,
+                            config: Config,
+                            varying_param: list[tuple[str, int | float]],
+                            delta: ConfigOptionMap
+                          ) -> None:
+  """ density vs flow diagram for all configs in one plot """
+  figure = plt.figure()
+  figure.set_size_inches(8, 6)
+  deltas = [ConfigOptionMap.from_field_name(varying_param[0][0])]
+  if delta not in deltas:
+    deltas.append(delta)
+  figure.suptitle(f"Config params:\n{config.get_short_description(deltas)}")
+
+  for i in range(len(densities)):
+    plt.plot(densities[i], flows[i], linewidth=1, label=f"{varying_param[i][0]}={varying_param[i][1]}")
+  plt.legend()
+  plt.title("Densities vs Flows (all in one)")
+  plt.xlabel("Density")
+  plt.ylabel("Flow")
+  plt.tight_layout()
+  save_plot_as_png(plt, config.outputFilePrefix, "density-flow-all-in-one")

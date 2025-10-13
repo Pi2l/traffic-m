@@ -66,9 +66,14 @@ def draw_combined_plots(grouped_configs: dict[tuple[str, int | float], list[Conf
     print("Combined plots cannot be drawn when more than one delta is present")
     return
 
+  config = copy.deepcopy(default_config)
+  config.outputFilePrefix += f"_{delta}"
+  for group_key, _ in grouped_configs.items():
+    config.outputFilePrefix += f"_{group_key[0]}={group_key[1]}"
+
   density_average_speed_all_in_one(np.array(densities_per_group),
                                    np.array(average_speeds_per_group),
-                                   default_config,
+                                   config,
                                    deltas_per_group,
                                    delta)
   # density_flow_all_in_one(np.array(densities_per_group), np.array(flows_per_group), default_config, delta_param)
@@ -113,7 +118,13 @@ def get_grouped_configs(configs_with_stats: dict[Config, set], args: argparse.Na
     grouped_configs[group_key].append(config)
 
   return grouped_configs
-  
+
+def get_global_plot_dir(default_config: Config) -> Config:
+  config = copy.deepcopy(default_config)
+  prefix = config.outputFilePrefix.split("/")[-1] # prefix
+  global_plots_dir = "/".join(config.outputFilePrefix.split("/")[:-1]) + "/global-plots"
+  config.outputFilePrefix = f"{global_plots_dir}/{prefix}"
+  return config
 
 def main() -> int:
   # plan:
@@ -150,13 +161,12 @@ def main() -> int:
     group_configs_with_stats = {config: configs_with_stats[config] for config in group_configs}
     delta = determine_varying_parameter(group_configs)
 
-    config = copy.deepcopy(default_config)
-    prefix = config.outputFilePrefix.split("/")[-1] # prefix
-    global_plots_dir = "/".join(config.outputFilePrefix.split("/")[:-1]) + "/global-plots"
-    config.outputFilePrefix = f"{global_plots_dir}/{prefix}_{delta}_{group_key[0]}={str(group_key[1])}"  # append first key=value to outputFilePrefix
-    draw_separate_plots(group_configs_with_stats, config, delta)
+    default_config_per_group = get_global_plot_dir(default_config)
+    default_config_per_group.outputFilePrefix += f"_{delta}_{group_key[0]}={str(group_key[1])}"  # append first key=value to outputFilePrefix
+    draw_separate_plots(group_configs_with_stats, default_config_per_group, delta)
 
-  draw_combined_plots(grouped_configs, default_config, configs_with_stats)
+  config = get_global_plot_dir(default_config)
+  draw_combined_plots(grouped_configs, config, configs_with_stats)
   pass
 
 if __name__ == '__main__':

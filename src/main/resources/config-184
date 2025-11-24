@@ -1,11 +1,10 @@
-//INFINITE_STEP_COUNT = -1
 model=rule184
-roadLength=8
-stepCount=10
-carCount=4
+roadLength=100
+stepCount=100
+carCount=50
 maxSpeed=1
-stepDuration=10
+stepDuration=0
 brakingProbability=0
 isCyclic=false
-outputFilePrefix=out/test-184
+outputFilePrefix=out/rule-184/test-184
 randomSeed=322

@@ -4,7 +4,7 @@ from config.model_type import ModelType
 
 
 class ConfigOptionMap(StrEnum):
-  # ab_L=1000_N=200_Vmax=5_p=0.33p0=0.70_LST=2_pLST=0.20
+  # ab_L=1000_N=200_Vmax=5_p=0.33p0=0.70_LST=2_pLST=0.20_pMSP=0.30
   ROAD_LENGTH = "L"
   CAR_COUNT = "N"
   MAX_SPEED = "Vmax"
@@ -12,6 +12,7 @@ class ConfigOptionMap(StrEnum):
   P0_PROBABILITY = "p0"
   LOW_SPEED_THRESHOLD = "LST"
   P_LOW_SPEED_THRESHOLD = "pLST"
+  P_AT_MAX_SPEED = "pMSP"
 
   @classmethod
   def get_value_of_mapping(cls):
@@ -21,8 +22,9 @@ class ConfigOptionMap(StrEnum):
       "maxSpeed": cls.MAX_SPEED,
       "brakingProbability": cls.BRAKING_PROBABILITY,
       "startAccelerationProbability": cls.P0_PROBABILITY,
-      "lowSpeedThreshold": cls.LOW_SPEED_THRESHOLD,
-      "lowSpeedThresholdBrakingProbability": cls.P_LOW_SPEED_THRESHOLD,
+      # "lowSpeedThreshold": cls.LOW_SPEED_THRESHOLD,
+      # "lowSpeedThresholdBrakingProbability": cls.P_LOW_SPEED_THRESHOLD,
+      "maxSpeedBrakingProbability": cls.P_AT_MAX_SPEED,
     }
 
   @classmethod
@@ -58,6 +60,8 @@ class Config:
     self.startAccelerationProbability = 0.0 # p0
     self.lowSpeedThreshold = 0
     self.lowSpeedThresholdBrakingProbability = 0.0
+    self.useMaxSpeedBrakingProbability = False
+    self.maxSpeedBrakingProbability = 0.0
 
   def setField(self, key: str, value: str):
     if key == "roadLength":
@@ -86,8 +90,10 @@ class Config:
       self.lowSpeedThreshold = int(value)
     elif key == "lowSpeedThresholdBrakingProbability":
       self.lowSpeedThresholdBrakingProbability = float(value)
-    elif key == "useLowSpeedBrakingProbability":
-      self.useLowSpeedBrakingProbability = value.lower() in ("true", "1", "yes")
+    elif key == "useMaxSpeedBrakingProbability":
+      self.useMaxSpeedBrakingProbability = value.lower() in ("true", "1", "yes")
+    elif key == "maxSpeedBrakingProbability":
+      self.maxSpeedBrakingProbability = float(value)
       
     else:
       raise ValueError(f"Unknown config key: {key}")
@@ -112,13 +118,15 @@ class Config:
     elif self.modelType == ModelType.ACCELERATION_BASED_MODEL:
       if ConfigOptionMap.P0_PROBABILITY not in varying_params:
         description_parts.append(f"p0={self.startAccelerationProbability}")
-      if ConfigOptionMap.LOW_SPEED_THRESHOLD not in varying_params:
-        description_parts.append(f"LST={self.lowSpeedThreshold}")
-      if ConfigOptionMap.P_LOW_SPEED_THRESHOLD not in varying_params:
-        description_parts.append(f"pLST={self.lowSpeedThresholdBrakingProbability}")
+      # if ConfigOptionMap.LOW_SPEED_THRESHOLD not in varying_params:
+      #   description_parts.append(f"LST={self.lowSpeedThreshold}")
+      # if ConfigOptionMap.P_LOW_SPEED_THRESHOLD not in varying_params:
+      #   description_parts.append(f"pLST={self.lowSpeedThresholdBrakingProbability}")
+      if ConfigOptionMap.P_AT_MAX_SPEED not in varying_params:
+        description_parts.append(f"p_m={self.maxSpeedBrakingProbability}")
 
       general_description = ", ".join(description_parts)
-      description = (f"ABM: {general_description}")
+      description = (f"VBM: {general_description}")
     return description
 
   def __str__(self):
@@ -126,7 +134,8 @@ class Config:
             f"stepDuration={self.stepDuration}, brakingProbability={self.brakingProbability}, isCyclic={self.isCyclic}, "
             f"outputFilePrefix='{self.outputFilePrefix}', stepCount={self.stepCount}, randomSeed={self.randomSeed}, "
             f"modelType={self.modelType}, startAccelerationProbability={self.startAccelerationProbability}, "
-            f"lowSpeedThreshold={self.lowSpeedThreshold}, lowSpeedThresholdBrakingProbability={self.lowSpeedThresholdBrakingProbability})")
+            f"lowSpeedThreshold={self.lowSpeedThreshold}, lowSpeedThresholdBrakingProbability={self.lowSpeedThresholdBrakingProbability}, "
+            f"maxSpeedBrakingProbability={self.maxSpeedBrakingProbability})")
 
   # operator to compare two configs that whould be used for sorting
   def __lt__(self, other):
@@ -147,4 +156,6 @@ class Config:
       return self.lowSpeedThreshold < other.lowSpeedThreshold
     if self.lowSpeedThresholdBrakingProbability != other.lowSpeedThresholdBrakingProbability:
       return self.lowSpeedThresholdBrakingProbability < other.lowSpeedThresholdBrakingProbability
+    if self.maxSpeedBrakingProbability != other.maxSpeedBrakingProbability:
+      return self.maxSpeedBrakingProbability < other.maxSpeedBrakingProbability
     return False

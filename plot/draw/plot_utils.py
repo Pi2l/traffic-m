@@ -150,6 +150,20 @@ def density_average_speed_all_in_one(densities: np.ndarray,
   plt.tight_layout()
   save_plot_as_png(plt, config.outputFilePrefix, "density-average-speed-all-in-one")
 
+def write_flow_capacity_stats(flows: np.ndarray, config: Config, configs_with_stats_items: list[set[Config, set]]) -> None:
+  max_flow = np.max(flows)
+  capacity_index = np.argmax(flows)
+  capacity_flow = flows[capacity_index]
+
+  with open(f"{config.outputFilePrefix}/flow-capacity-stats.txt", "w") as f:
+    f.write(f"Max Flow: {max_flow}\n")
+    f.write(f"Capacity Flow: {capacity_flow} at index {capacity_index}\n")
+    f.write(f"Config at Capacity Flow:\n")
+    config_at_capacity = configs_with_stats_items[capacity_index][0]
+    f.write(config_at_capacity.get_short_description())
+  print(f"Flow capacity stats saved to {config.outputFilePrefix}/flow-capacity-stats.txt")
+  pass
+
 def density_flow(density: np.ndarray, flow: np.ndarray, config: Config, varying_param: list[ConfigOptionMap]) -> None:
   """ density vs flow diagram """
   figure = plt.figure()

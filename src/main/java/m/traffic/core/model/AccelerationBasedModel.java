@@ -183,7 +183,9 @@ public class AccelerationBasedModel implements TrafficModel {
     } else if (randomValue < config.getBrakingProbability()) {
       // normal braking
       currentCar.setVelocity(carAcceleratedVelocity - 1);
-    } else if (config.isUseLowSpeedBrakingProbability() && randomValue < Math.min(1, config.getBrakingProbability() + 0.1f) && carCurrentVelocity >= (config.getMaxSpeed()-1)) {
+    } else if (config.isUseMaxSpeedBrakingProbability() &&
+              randomValue < Math.min(1, config.getMaxSpeedBrakingProbability()) &&
+              carCurrentVelocity >= (config.getMaxSpeed()-1)) {
       // chance to accelerate if car is at max speed should be lower
       currentCar.setVelocity(carAcceleratedVelocity - 1);
     }

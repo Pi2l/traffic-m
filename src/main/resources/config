@@ -1,10 +1,10 @@
 model=Nagel_Schreckenberg
-roadLength=1000
-stepCount=1000
-carCount=200
+roadLength=200
+stepCount=5000
+carCount=21
 maxSpeed=5
-stepDuration=10
-brakingProbability=0.33
+stepDuration=0
+brakingProbability=0.3
 isCyclic=true
-outputFilePrefix=out/test
+outputFilePrefix=out/3.1-nasch-5000/test
 randomSeed=311

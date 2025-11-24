@@ -10,13 +10,14 @@ public class AccelerationBasedModelConfig extends SimulationConfig {
   private double startAccelerationProbability;
   private int lowSpeedThreshold;
   private double lowSpeedThresholdBrakingProbability;
-  private boolean useLowSpeedBrakingProbability;
+  private boolean useMaxSpeedBrakingProbability;
+  private double maxSpeedBrakingProbability;
     
   public AccelerationBasedModelConfig(int roadLength, int carCount, int maxSpeed,
       int stepDuration, double brakingProbability, boolean isCyclic, String outputFilePrefix,
       int stepCount, long randomSeed, ModelType modelType,
       double startAccelerationProbability, int lowSpeedThreshold, double lowSpeedThresholdBrakingProbability,
-      boolean useLowSpeedBrakingProbability) {
+      boolean useLowSpeedBrakingProbability, double lowSpeedBrakingProbability) {
     super(roadLength, carCount, maxSpeed, stepDuration, brakingProbability, isCyclic, outputFilePrefix,
         stepCount, randomSeed, modelType);
 
@@ -27,7 +28,8 @@ public class AccelerationBasedModelConfig extends SimulationConfig {
     this.startAccelerationProbability = startAccelerationProbability;
     this.lowSpeedThreshold = lowSpeedThreshold;
     this.lowSpeedThresholdBrakingProbability = lowSpeedThresholdBrakingProbability;
-    this.useLowSpeedBrakingProbability = useLowSpeedBrakingProbability;
+    this.useMaxSpeedBrakingProbability = useLowSpeedBrakingProbability;
+    this.maxSpeedBrakingProbability = lowSpeedBrakingProbability;
   }
 
   public static AccelerationBasedModelConfig defaultConfig() {
@@ -46,7 +48,8 @@ public class AccelerationBasedModelConfig extends SimulationConfig {
       0.5f,
       2,
       0.2f,
-      true
+      true,
+      0.3f
     );
   }
 
@@ -65,7 +68,8 @@ public class AccelerationBasedModelConfig extends SimulationConfig {
         config.getStartAccelerationProbability(),
         config.getLowSpeedThreshold(),
         config.getLowSpeedThresholdBrakingProbability(),
-        config.isUseLowSpeedBrakingProbability()
+        config.isUseMaxSpeedBrakingProbability(),
+        config.getMaxSpeedBrakingProbability()
     );
   }
 }

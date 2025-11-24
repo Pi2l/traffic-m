@@ -27,6 +27,8 @@ def parse_config_from_filename(original_config: Config, file_name: str) -> Confi
       config.lowSpeedThreshold = int(value)
     elif key == ConfigOptionMap.P_LOW_SPEED_THRESHOLD:
       config.lowSpeedThresholdBrakingProbability = float(value)
+    elif key == ConfigOptionMap.P_AT_MAX_SPEED:
+      config.maxSpeedBrakingProbability = float(value)
     else:
       raise ValueError(f"Unknown config key: {key} in file name: {file_name}")
 
@@ -76,5 +78,5 @@ def build_dir_name_from_params(config: Config):
   prefix = config.outputFilePrefix.split("/")[-1]
   dir_name = f"{prefix}_L={config.roadLength}_N={config.carCount}_Vmax={config.maxSpeed}_p={config.brakingProbability:.2f}"
   if config.modelType == ModelType.ACCELERATION_BASED_MODEL:
-      dir_name += f"p0={config.startAccelerationProbability:.2f}_LST={config.lowSpeedThreshold}_pLST={config.lowSpeedThresholdBrakingProbability:.2f}"
+      dir_name += f"p0={config.startAccelerationProbability:.2f}_LST={config.lowSpeedThreshold}_pLST={config.lowSpeedThresholdBrakingProbability:.2f}_pMSP={config.maxSpeedBrakingProbability:.2f}"
   return dir_name

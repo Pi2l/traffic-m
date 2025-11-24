@@ -10,11 +10,13 @@ public class AccelerationBasedModelConfig extends SimulationConfig {
   private double startAccelerationProbability;
   private int lowSpeedThreshold;
   private double lowSpeedThresholdBrakingProbability;
+  private boolean useLowSpeedBrakingProbability;
     
   public AccelerationBasedModelConfig(int roadLength, int carCount, int maxSpeed,
       int stepDuration, double brakingProbability, boolean isCyclic, String outputFilePrefix,
       int stepCount, long randomSeed, ModelType modelType,
-      double startAccelerationProbability, int lowSpeedThreshold, double lowSpeedThresholdBrakingProbability) {
+      double startAccelerationProbability, int lowSpeedThreshold, double lowSpeedThresholdBrakingProbability,
+      boolean useLowSpeedBrakingProbability) {
     super(roadLength, carCount, maxSpeed, stepDuration, brakingProbability, isCyclic, outputFilePrefix,
         stepCount, randomSeed, modelType);
 
@@ -25,6 +27,7 @@ public class AccelerationBasedModelConfig extends SimulationConfig {
     this.startAccelerationProbability = startAccelerationProbability;
     this.lowSpeedThreshold = lowSpeedThreshold;
     this.lowSpeedThresholdBrakingProbability = lowSpeedThresholdBrakingProbability;
+    this.useLowSpeedBrakingProbability = useLowSpeedBrakingProbability;
   }
 
   public static AccelerationBasedModelConfig defaultConfig() {
@@ -42,7 +45,8 @@ public class AccelerationBasedModelConfig extends SimulationConfig {
       baseConfig.getModelType(),
       0.5f,
       2,
-      0.2f
+      0.2f,
+      true
     );
   }
 
@@ -60,7 +64,8 @@ public class AccelerationBasedModelConfig extends SimulationConfig {
         config.getModelType(),
         config.getStartAccelerationProbability(),
         config.getLowSpeedThreshold(),
-        config.getLowSpeedThresholdBrakingProbability()
+        config.getLowSpeedThresholdBrakingProbability(),
+        config.isUseLowSpeedBrakingProbability()
     );
   }
 }

@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MultipleLocator
 import numpy as np
 
 from config.config_base import Config, ConfigOptionMap
@@ -11,9 +12,16 @@ def draw_space_time_diagram(position, velocity, time, output_prefix, params: Con
   figure.set_size_inches(16, 8)
 
   figure.suptitle(f"Config params:\n{params.get_short_description()}")
-  extents_position = get_extents(position, time)
+  # src_start = 8000 # to get sample of vehicles' positions in later iterations
+  # src_end_inclusive = 9000
+  # position = position[src_start:src_end_inclusive+1].copy()
+  # time = time[src_start:src_end_inclusive+1].copy()
+  # velocity = velocity[src_start:src_end_inclusive+1].copy()
+  # extents_position = get_position_extents_2(position, src_start, src_end_inclusive)
+  # extents_velocity = get_position_extents_2(velocity, src_start, src_end_inclusive)
 
-  extents_velocity = get_extents(velocity, time)
+  extents_position = get_position_extents(position, time)
+  extents_velocity = get_position_extents(velocity, time)
   im1 = ax1.imshow(velocity, extent=extents_velocity, origin='lower', aspect='auto', cmap='coolwarm')
   plt.colorbar(im1, ax=ax1, orientation='vertical')
   ax1.set_title("Vehicle velocity")
@@ -54,6 +62,22 @@ def iterations_global_flow(time: np.ndarray, flow: np.ndarray, config: Config, s
   plt.tight_layout()
   save_plot_as_png(plt, config.outputFilePrefix, "iterations-global-flow")
 
+def get_position_extents_2(position: np.ndarray, start, end) -> tuple:
+  x1 = 0
+  x2 = position.shape[1] - 0
+  t1 = start
+  t2 = end
+  extents = [x1, x2, t1, t2]
+  return extents
+
+def get_position_extents(position: np.ndarray, time: np.ndarray) -> tuple:
+  x1 = 0
+  x2 = position.shape[1] - 0
+  t1 = 0
+  t2 = time.shape[0] - 1
+  extents = [x1, x2, t1, t2]
+  return extents
+
 def get_extents(position: np.ndarray, time: np.ndarray) -> tuple:
   x1 = 0
   x2 = position.shape[0] - 1
@@ -82,6 +106,12 @@ def density_average_speed(density: np.ndarray, average_speed: np.ndarray, config
   figure.set_size_inches(8, 6)
   figure.suptitle(f"Config params:\n{config.get_short_description(varying_param)}")
 
+  ax = plt.gca()
+  ax.xaxis.set_major_locator(MultipleLocator(0.2))
+  ax.xaxis.set_minor_locator(MultipleLocator(0.1))
+  ax.yaxis.set_major_locator(MultipleLocator(1.0))
+  ax.yaxis.set_minor_locator(MultipleLocator(0.5))
+  plt.grid(True, linestyle='--', linewidth=0.5, alpha=0.7, which='both')
   plt.scatter(density, average_speed, c='blue', s=3)
   plt.plot(density, average_speed, color='red', linewidth=1)  # draw line thru points
   plt.title("Density vs Average Speed")
@@ -103,6 +133,13 @@ def density_average_speed_all_in_one(densities: np.ndarray,
   if delta not in deltas:
     deltas.append(delta)
   figure.suptitle(f"Config params:\n{config.get_short_description(deltas)}")
+  
+  ax = plt.gca()
+  ax.xaxis.set_major_locator(MultipleLocator(0.2))
+  ax.xaxis.set_minor_locator(MultipleLocator(0.1))
+  ax.yaxis.set_major_locator(MultipleLocator(1.0))
+  ax.yaxis.set_minor_locator(MultipleLocator(0.5))
+  plt.grid(True, linestyle='--', linewidth=0.5, alpha=0.7, which='both')
 
   for i in range(len(densities)):
     plt.plot(densities[i], average_speeds[i], linewidth=1, label=f"{varying_param[i][0]}={varying_param[i][1]}")
@@ -118,6 +155,11 @@ def density_flow(density: np.ndarray, flow: np.ndarray, config: Config, varying_
   figure = plt.figure()
   figure.set_size_inches(8, 6)
   figure.suptitle(f"Config params:\n{config.get_short_description(varying_param)}")
+
+  ax = plt.gca()
+  ax.xaxis.set_major_locator(MultipleLocator(0.2))
+  ax.xaxis.set_minor_locator(MultipleLocator(0.1))
+  plt.grid(True, linestyle='--', linewidth=0.5, alpha=0.7, which='both')
 
   plt.scatter(density, flow, c='blue', s=3)
   plt.plot(density, flow, color='red', linewidth=1)
@@ -140,6 +182,11 @@ def density_flow_all_in_one(densities: np.ndarray,
   if delta not in deltas:
     deltas.append(delta)
   figure.suptitle(f"Config params:\n{config.get_short_description(deltas)}")
+
+  ax = plt.gca()
+  ax.xaxis.set_major_locator(MultipleLocator(0.2))
+  ax.xaxis.set_minor_locator(MultipleLocator(0.1))
+  plt.grid(True, linestyle='--', linewidth=0.5, alpha=0.7, which='both')
 
   for i in range(len(densities)):
     plt.plot(densities[i], flows[i], linewidth=1, label=f"{varying_param[i][0]}={varying_param[i][1]}")

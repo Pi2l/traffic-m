@@ -229,6 +229,9 @@ public class ConfigParser {
       double lowSpeedThresholdBrakingProbability = Double.parseDouble(configMap.getOrDefault(
                                       "lowSpeedThresholdBrakingProbability",
                                       defaultConfig.getLowSpeedThresholdBrakingProbability() + ""));
+      boolean useLowSpeedBrakingProbability = Boolean.parseBoolean(configMap.getOrDefault(
+                                      "useLowSpeedBrakingProbability",
+                                      defaultConfig.isUseLowSpeedBrakingProbability() + ""));
 
       return new AccelerationBasedModelConfig(
                     baseConfig.getRoadLength(),
@@ -243,7 +246,8 @@ public class ConfigParser {
                     baseConfig.getModelType(),
                     startAccelerationProbability,
                     lowSpeedThreshold,
-                    lowSpeedThresholdBrakingProbability
+                    lowSpeedThresholdBrakingProbability,
+                    useLowSpeedBrakingProbability
       );
     } catch (NumberFormatException e) {
       e.printStackTrace();

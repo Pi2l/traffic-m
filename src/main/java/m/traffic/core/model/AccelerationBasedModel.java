@@ -47,6 +47,7 @@ public class AccelerationBasedModel implements TrafficModel {
       Vehicle car;
       do {
         int position = getRandomInt(config.getRoadLength());
+        // int position = config.getRoadLength() / config.getCarCount() * i;
         car = new Vehicle(position, 0);
 
       } while (road.get(car.getRoadPosition()).getItem() != null);
@@ -60,6 +61,7 @@ public class AccelerationBasedModel implements TrafficModel {
     int carCount = cars.size();
     for (int i = 0; i < carCount; ++i) {
       int speed = getRandomInt(config.getMaxSpeed() + 1);
+      // int speed = config.getMaxSpeed();
 
       Vehicle currentCar = cars.get(i);
       int distanceToNextCar = getDistanceToNextCar(currentCar, getNextCar(i, carCount));
@@ -181,7 +183,7 @@ public class AccelerationBasedModel implements TrafficModel {
     } else if (randomValue < config.getBrakingProbability()) {
       // normal braking
       currentCar.setVelocity(carAcceleratedVelocity - 1);
-    } else if (randomValue < Math.min(1, config.getBrakingProbability() + 0.1f) && carCurrentVelocity >= (config.getMaxSpeed() - 1)) {
+    } else if (config.isUseLowSpeedBrakingProbability() && randomValue < Math.min(1, config.getBrakingProbability() + 0.1f) && carCurrentVelocity >= (config.getMaxSpeed()-1)) {
       // chance to accelerate if car is at max speed should be lower
       currentCar.setVelocity(carAcceleratedVelocity - 1);
     }

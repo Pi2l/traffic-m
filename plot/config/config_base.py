@@ -86,6 +86,8 @@ class Config:
       self.lowSpeedThreshold = int(value)
     elif key == "lowSpeedThresholdBrakingProbability":
       self.lowSpeedThresholdBrakingProbability = float(value)
+    elif key == "useLowSpeedBrakingProbability":
+      self.useLowSpeedBrakingProbability = value.lower() in ("true", "1", "yes")
       
     else:
       raise ValueError(f"Unknown config key: {key}")

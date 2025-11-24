@@ -26,6 +26,14 @@
       ],
       "program": "./plot/plotbuilder.py",
     },
+    {
+      "type": "debugpy",
+      "request": "launch",
+      "name": "Python: Real data",
+      "args": [],
+      "cwd": "${workspaceFolder}/real-data",
+      "program": "./ngsim-analyser.py",
+    },
   ],
   "inputs": [
     {

@@ -1,6 +1,9 @@
 import argparse
 import copy
 import numpy as np
+import threading
+from concurrent.futures import ThreadPoolExecutor
+from multiprocessing.pool import ThreadPool
 
 from config.args_parser import get_args, parse_and_filter_configs, parse_secondary_filters
 from config.config_utils import read_all_configs
@@ -131,6 +134,7 @@ def get_global_plot_dir(default_config: Config) -> Config:
   return config
 
 def main() -> int:
+  # 0:1:0.01
   # plan:
   # 1. read config file (done)
   # 2. parse configs based on files names inside outputFilePrefix dir (done)
@@ -161,18 +165,29 @@ def main() -> int:
     configs_with_stats[config] = (position, velocity, time, average_speed, density, flow)
 
   grouped_configs = get_grouped_configs(configs_with_stats, args)
-  for group_key, group_configs in grouped_configs.items():
-    group_configs_with_stats = {config: configs_with_stats[config] for config in group_configs}
-    delta = determine_varying_parameter(group_configs)
+  with ThreadPoolExecutor(max_workers=7) as executor:
+    futures = [executor.submit(compute_stats_for_config, group_key, group_configs, default_config, configs_with_stats)
+                for group_key, group_configs in grouped_configs.items()]
 
-    default_config_per_group = get_global_plot_dir(default_config)
-    default_config_per_group.outputFilePrefix += f"_{delta}_{group_key[0]}={str(group_key[1])}"  # append first key=value to outputFilePrefix
-    deltas = {ConfigOptionMap.from_field_name(group_key[0]), delta}
-    draw_separate_plots(group_configs_with_stats, default_config_per_group, list(deltas))
+    for f in futures:
+      print(f.result())
 
   config = get_global_plot_dir(default_config)
   draw_combined_plots(grouped_configs, config, configs_with_stats)
   pass
+
+def compute_stats_for_config(group_key, group_configs, default_config, configs_with_stats):
+  print(f"Thread: {threading.current_thread().name}")
+    
+  group_configs_with_stats = {config: configs_with_stats[config] for config in group_configs}
+  delta = determine_varying_parameter(group_configs)
+  print(f"Drawing plots for group {group_key} with delta {delta}")
+
+  default_config_per_group = get_global_plot_dir(default_config)
+  default_config_per_group.outputFilePrefix += f"_{delta}_{group_key[0]}={str(group_key[1])}"  # append first key=value to outputFilePrefix
+  deltas = {ConfigOptionMap.from_field_name(group_key[0]), delta}
+  draw_separate_plots(group_configs_with_stats, default_config_per_group, list(deltas))
+  return f"Completed plots for group {group_key}"
 
 if __name__ == '__main__':
   import sys

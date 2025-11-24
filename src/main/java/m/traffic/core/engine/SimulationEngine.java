@@ -2,11 +2,13 @@ package m.traffic.core.engine;
 
 import m.traffic.core.model.TrafficModel;
 import m.traffic.stats.StatsCollector;
+import java.util.logging.Logger;
 import m.traffic.core.data.config.SimulationConfig;
 import m.traffic.core.data.state.TrafficSnapshot;
 
 public class SimulationEngine {
 
+  private static final Logger logger = Logger.getLogger(SimulationEngine.class.getName());
   protected final TrafficModel model;
   protected final StatsCollector statsCollector;
   protected boolean running = false;
@@ -31,6 +33,7 @@ public class SimulationEngine {
 
       running = checkIfRunning(snapshot);
     }
+    logger.info("Simulaion %s completed.".formatted(model.getConfig().toString()));
   }
   
   private boolean checkIfRunning(TrafficSnapshot snapshot) {

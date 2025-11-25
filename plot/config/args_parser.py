@@ -21,6 +21,7 @@ def get_args(param: str = None) -> argparse.Namespace:
   parser.add_argument("--select-start-acceleration-probability", type=str, help="Select start acceleration probability (0.0:1.0:0.1)")
   parser.add_argument("--select-low-speed-threshold", type=str, help="Select low speed threshold (1:10:1)")
   parser.add_argument("--select-low-speed-threshold-braking-probability", type=str, help="Select low speed threshold braking probability (0.0:1.0:0.1)")
+  parser.add_argument("--select-max-speed-braking-probability", type=str, help="Select max speed braking probability (0.0:1.0:0.1)")
   
 # configuration arguments
   parser.add_argument("-c", "--config-file", type=str, required=True, help="Path to config file")
@@ -88,11 +89,13 @@ def parse_secondary_filters(args) -> dict[ConfigOptionMap, list[float | int]]:
   if args.select_braking_probability:
     filters[ConfigOptionMap.BRAKING_PROBABILITY] = parse_range_value(args.select_braking_probability)
   if args.select_start_acceleration_probability:
-    filters[ConfigOptionMap.START_ACCELERATION_PROBABILITY] = parse_range_value(args.select_start_acceleration_probability)
+    filters[ConfigOptionMap.P0_PROBABILITY] = parse_range_value(args.select_start_acceleration_probability)
   if args.select_low_speed_threshold:
     filters[ConfigOptionMap.LOW_SPEED_THRESHOLD] = parse_range_value(args.select_low_speed_threshold)
   if args.select_low_speed_threshold_braking_probability:
     filters[ConfigOptionMap.LOW_SPEED_THRESHOLD_BRAKING_PROBABILITY] = parse_range_value(args.select_low_speed_threshold_braking_probability)
+  if args.select_max_speed_braking_probability:
+    filters[ConfigOptionMap.P_AT_MAX_SPEED] = parse_range_value(args.select_max_speed_braking_probability)
     
   return filters
 
@@ -113,13 +116,13 @@ def filter_configs_by_criteria(configs: list[Config], filters: dict[ConfigOption
         config_value = config.maxSpeed
       elif option_map == ConfigOptionMap.BRAKING_PROBABILITY:
         config_value = config.brakingProbability
-      elif option_map == ConfigOptionMap.START_ACCELERATION_PROBABILITY:
+      elif option_map == ConfigOptionMap.P0_PROBABILITY:
         config_value = config.startAccelerationProbability
       elif option_map == ConfigOptionMap.LOW_SPEED_THRESHOLD:
         config_value = config.lowSpeedThreshold
-      elif option_map == ConfigOptionMap.LOW_SPEED_THRESHOLD_BRAKING_PROBABILITY:
+      elif option_map == ConfigOptionMap.P_LOW_SPEED_THRESHOLD:
         config_value = config.lowSpeedThresholdBrakingProbability
-      elif option_map == ConfigOptionMap.MAX_SPEED_BRAKING_PROBABILITY:
+      elif option_map == ConfigOptionMap.P_AT_MAX_SPEED:
         config_value = config.maxSpeedBrakingProbability
       
       # check if config value matches any of the allowed values

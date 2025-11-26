@@ -51,7 +51,7 @@ def draw_combined_plots(grouped_configs: dict[tuple[str, int | float], list[Conf
     group_configs_with_stats = {config: configs_with_stats[config] for config in group_configs}
     delta = determine_varying_parameter(group_configs)
     if delta not in [ConfigOptionMap.ROAD_LENGTH, ConfigOptionMap.CAR_COUNT]:
-      print("Combined plots cannot be drawn when delta is not ROAD_LENGTH or CAR_COUNT")
+      print("Комбіновані графіки не можуть бути побудовані, коли delta не є ROAD_LENGTH або CAR_COUNT")
       continue
     
     densities_per_config = []
@@ -71,7 +71,7 @@ def draw_combined_plots(grouped_configs: dict[tuple[str, int | float], list[Conf
     deltas_per_group.append(group_key)
   
   if len(deltas_names_per_group) > 1:
-    print("Combined plots cannot be drawn when more than one delta is present")
+    print("Комбіновані графіки не можуть бути побудовані, коли присутній більше одного delta")
     return
 
   config = copy.deepcopy(default_config)
@@ -105,10 +105,10 @@ def determine_varying_parameter(configs: list[Config]) -> ConfigOptionMap | None
     values = [getattr(c, key) for c in configs]
     if len(set(values)) > 1:
       if varying_param is not None:
-        raise ValueError("More than one parameter varies")
+        raise ValueError("Більше одного змінного параметра знайдено")
       varying_param = key
   if varying_param is None:
-    raise ValueError("No varying parameter found")
+    raise ValueError("Не знайдено жодного змінного параметра")
   varying_param = ConfigOptionMap.from_field_name(varying_param)
   return varying_param
 
@@ -143,15 +143,15 @@ def main() -> int:
   args = get_args()
   configs, default_config = read_all_configs(args.config_file)
   configs.sort()
-  print(f"Total configs found: {len(configs)}")
+  print(f"Загальна кількість конфігурацій: {len(configs)}")
   for config in configs:
     print(config)
 
   filtered_configs = parse_and_filter_configs(configs, args)
-  print(f"Final filtered configs: {len(filtered_configs)}")
+  print(f"Фінальна кількість відфільтрованих конфігурацій: {len(filtered_configs)}")
 
   if not filtered_configs:
-    print("No configs match the specified criteria!")
+    print("Жодна конфігурація не відповідає вказаним критеріям!")
     return 1
 
   configs_with_stats = dict[Config, set]()
@@ -173,17 +173,17 @@ def main() -> int:
   pass
 
 def compute_stats_for_config(group_key, group_configs, default_config, configs_with_stats):
-  print(f"Thread: {threading.current_thread().name}")
+  print(f"Потік(Thread): {threading.current_thread().name}")
     
   group_configs_with_stats = {config: configs_with_stats[config] for config in group_configs}
   delta = determine_varying_parameter(group_configs)
-  print(f"Drawing plots for group {group_key} with delta {delta}")
+  print(f"Малювання графіків для групи {group_key} з дельтою {delta}")
 
   default_config_per_group = get_global_plot_dir(default_config)
   default_config_per_group.outputFilePrefix += f"_{delta}_{group_key[0]}={str(group_key[1])}"  # append first key=value to outputFilePrefix
   deltas = {ConfigOptionMap.from_field_name(group_key[0]), delta}
   draw_separate_plots(group_configs_with_stats, default_config_per_group, list(deltas))
-  return f"Completed plots for group {group_key}"
+  return f"Завершено малювання графіків для групи {group_key}"
 
 if __name__ == '__main__':
   import sys

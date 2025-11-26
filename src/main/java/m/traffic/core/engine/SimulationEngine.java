@@ -52,7 +52,7 @@ public class SimulationEngine {
       return;
     }
     if (config.getStepDuration() < 0) {
-      throw new IllegalArgumentException("Step duration cannot be negative");
+      throw new IllegalArgumentException("Тривалість кроку не може бути від'ємною.");
     }
 
     try {

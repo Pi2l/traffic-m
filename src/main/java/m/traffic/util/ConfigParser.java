@@ -175,7 +175,7 @@ public class ConfigParser {
   private static String getValue(String value, int index) {
     String[] parts = value.split(DELIMITER);
     if (parts.length != 3) {
-      throw new IllegalArgumentException("Invalid parameter format, expected min:max:delta");
+      throw new IllegalArgumentException("Неправильний формат параметра, очікується min:max:delta");
     }
     return parts[index];
   }

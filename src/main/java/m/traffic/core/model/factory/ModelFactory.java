@@ -21,7 +21,7 @@ public class ModelFactory {
       case VELOCITY_BASED_MODEL:
         return new VelocityBasedModel();
       default:
-        throw new IllegalArgumentException("Unknown model type: " + modelType);
+        throw new IllegalArgumentException("Невідомий тип моделі: " + modelType);
     }
   }
 }

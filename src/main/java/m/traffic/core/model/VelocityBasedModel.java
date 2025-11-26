@@ -26,7 +26,7 @@ public class VelocityBasedModel implements TrafficModel {
   @Override
   public void initialise(SimulationConfig config) {
     if (!(config instanceof VelocityBasedModelConfig abmConfig)) {
-      throw new IllegalArgumentException("Config should be of type VelocityBasedModelConfig");
+      throw new IllegalArgumentException("Конфігурація повинна бути типу VelocityBasedModelConfig");
     }
     this.config = abmConfig;
     random = new Random(abmConfig.getRandomSeed());

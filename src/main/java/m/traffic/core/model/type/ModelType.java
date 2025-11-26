@@ -21,6 +21,6 @@ public enum ModelType {
         return type;
       }
     }
-    throw new IllegalArgumentException("Unknown model type: " + name);
+    throw new IllegalArgumentException("Невідомий тип моделі: " + name);
   }
 }

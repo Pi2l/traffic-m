@@ -148,14 +148,14 @@ def parse_and_filter_configs(configs: list[Config], args) -> list[Config]:
   
   primary_filters = parse_primary_filters(args)
   if primary_filters:
-    print(f"Applying primary filters: {primary_filters}")
+    print(f"Застосування первинних фільтрів: {primary_filters}")
     filtered_configs = filter_configs_by_criteria(filtered_configs, primary_filters)
-    print(f"After primary filtering: {len(filtered_configs)} configs remaining")
+    print(f"Після первинного фільтрування: залишилось {len(filtered_configs)} конфігурацій")
   
   secondary_filters = parse_secondary_filters(args)
   if secondary_filters:
-    print(f"Applying secondary filters: {secondary_filters}")
+    print(f"Застосування вторинних фільтрів: {secondary_filters}")
     filtered_configs = filter_configs_by_criteria(filtered_configs, secondary_filters)
-    print(f"After secondary filtering: {len(filtered_configs)} configs remaining")
+    print(f"Після вторинного фільтрування: залишилось {len(filtered_configs)} конфігурацій")
   
   return filtered_configs

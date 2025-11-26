@@ -126,7 +126,7 @@ class Config:
         description_parts.append(f"p_m={self.maxSpeedBrakingProbability}")
 
       general_description = ", ".join(description_parts)
-      description = (f"VBM: {general_description}")
+      description = (f"Модифікована: {general_description}")
     return description
 
   def __str__(self):

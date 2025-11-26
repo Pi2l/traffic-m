@@ -11,7 +11,7 @@ def draw_space_time_diagram(position, velocity, time, output_prefix, params: Con
   figure, (ax1, ax2) = plt.subplots(1, 2)
   figure.set_size_inches(16, 8)
 
-  figure.suptitle(f"Config params:\n{params.get_short_description()}")
+  figure.suptitle(f"Параметри конфігурації:\n{params.get_short_description()}")
   # src_start = 8000 # to get sample of vehicles' positions in later iterations
   # src_end_inclusive = 9000
   # position = position[src_start:src_end_inclusive+1].copy()
@@ -24,15 +24,15 @@ def draw_space_time_diagram(position, velocity, time, output_prefix, params: Con
   extents_velocity = get_position_extents(velocity, time)
   im1 = ax1.imshow(velocity, extent=extents_velocity, origin='lower', aspect='auto', cmap='coolwarm')
   plt.colorbar(im1, ax=ax1, orientation='vertical')
-  ax1.set_title("Vehicle velocity")
-  ax1.set_xlabel("Position")
-  ax1.set_ylabel("Time")
+  ax1.set_title("Швидкість ТЗ")
+  ax1.set_xlabel("Поздовжня позиція")
+  ax1.set_ylabel("Час")
 
   im2 = ax2.imshow(position, extent=extents_position, origin='lower', aspect='auto')
   plt.colorbar(im2, ax=ax2, orientation='vertical')
-  ax2.set_title("Vehicle position")
-  ax2.set_xlabel("Position")
-  ax2.set_ylabel("Time")
+  ax2.set_title("Поздовжня позиція ТЗ")
+  ax2.set_xlabel("Поздовжня позиція")
+  ax2.set_ylabel("Час")
 
   plt.tight_layout()
   save_plot_as_png(plt, output_prefix, "space-time-diagram")
@@ -41,7 +41,7 @@ def draw_space_time_diagram(position, velocity, time, output_prefix, params: Con
 def iterations_global_flow(time: np.ndarray, flow: np.ndarray, config: Config, skip_fraction: float = 0.001) -> None:
   figure = plt.figure()
   figure.set_size_inches(8, 6)
-  figure.suptitle(f"Config params:\n{config.get_short_description()}")
+  figure.suptitle(f"Параметри конфігурації:\n{config.get_short_description()}")
 
   time_copy = np.copy(time)
   flow_copy = np.copy(flow)
@@ -56,9 +56,9 @@ def iterations_global_flow(time: np.ndarray, flow: np.ndarray, config: Config, s
 
   plt.scatter(time_vs_flow[0], time_vs_flow[1], c='blue', s=1)
   plt.ylim(lower, upper)
-  plt.title("Global flow over iterations")
-  plt.xlabel("Iterations")
-  plt.ylabel("Global flow")
+  plt.title("Глобальний потік по ітераціях")
+  plt.xlabel("Ітерація")
+  plt.ylabel("Глобальний потік")
   plt.tight_layout()
   save_plot_as_png(plt, config.outputFilePrefix, "iterations-global-flow")
 
@@ -94,7 +94,7 @@ def save_plot_as_png(plt, output_prefix: str, file_name: str, dpi: int = 300) ->
     os.makedirs(dir_to_save)
 
   plt.savefig(os.path.join(dir_to_save, file_name) + '.png', dpi=dpi)
-  print(f"Plot saved to {os.path.join(dir_to_save, file_name)}.png")
+  print(f"Графік збережено у {os.path.join(dir_to_save, file_name)}.png")
   plt.close()
 
 # this diagram can be created only when we have varying density (N changing)
@@ -104,7 +104,7 @@ def density_average_speed(density: np.ndarray, average_speed: np.ndarray, config
   """ density vs average speed diagram """
   figure = plt.figure()
   figure.set_size_inches(8, 6)
-  figure.suptitle(f"Config params:\n{config.get_short_description(varying_param)}")
+  figure.suptitle(f"Параметри конфігурації:\n{config.get_short_description(varying_param)}")
 
   ax = plt.gca()
   ax.xaxis.set_major_locator(MultipleLocator(0.2))
@@ -114,9 +114,9 @@ def density_average_speed(density: np.ndarray, average_speed: np.ndarray, config
   plt.grid(True, linestyle='--', linewidth=0.5, alpha=0.7, which='both')
   plt.scatter(density, average_speed, c='blue', s=3)
   plt.plot(density, average_speed, color='red', linewidth=1)  # draw line thru points
-  plt.title("Density vs Average Speed")
-  plt.xlabel("Density")
-  plt.ylabel("Average Speed")
+  plt.title("Щільність - середня швидкість")
+  plt.xlabel("Щільність")
+  plt.ylabel("Середня швидкість")
   plt.tight_layout()
   save_plot_as_png(plt, config.outputFilePrefix, "density-average-speed")
 
@@ -132,7 +132,7 @@ def density_average_speed_all_in_one(densities: np.ndarray,
   deltas = [ConfigOptionMap.from_field_name(varying_param[0][0])]
   if delta not in deltas:
     deltas.append(delta)
-  figure.suptitle(f"Config params:\n{config.get_short_description(deltas)}")
+  figure.suptitle(f"Параметри конфігурації:\n{config.get_short_description(deltas)}")
   
   ax = plt.gca()
   ax.xaxis.set_major_locator(MultipleLocator(0.2))
@@ -144,31 +144,40 @@ def density_average_speed_all_in_one(densities: np.ndarray,
   for i in range(len(densities)):
     plt.plot(densities[i], average_speeds[i], linewidth=1, label=f"{varying_param[i][0]}={varying_param[i][1]}")
   plt.legend()
-  plt.title("Densities vs Average Speeds (all in one)")
-  plt.xlabel("Density")
-  plt.ylabel("Average Speed")
+  plt.title("Щільність - середня швидкість")
+  plt.xlabel("Щільність")
+  plt.ylabel("Середня швидкість")
   plt.tight_layout()
   save_plot_as_png(plt, config.outputFilePrefix, "density-average-speed-all-in-one")
 
-def write_flow_capacity_stats(flows: np.ndarray, config: Config, configs_with_stats_items: list[set[Config, set]]) -> None:
+def write_flow_capacity_stats(flows: np.ndarray, config: Config, configs_with_stats_items: list[set[Config, set]], velocities: np.ndarray) -> None:
   max_flow = np.max(flows)
   capacity_index = np.argmax(flows)
-  capacity_flow = flows[capacity_index]
+  capacity_flow = max_flow
+
+  max_velocity = np.max(velocities)
+  max_velocity_index = np.argmax(velocities)
 
   with open(f"{config.outputFilePrefix}/flow-capacity-stats.txt", "w") as f:
-    f.write(f"Max Flow: {max_flow}\n")
-    f.write(f"Capacity Flow: {capacity_flow} at index {capacity_index}\n")
-    f.write(f"Config at Capacity Flow:\n")
+    f.write(f"Максимальний потік: {max_flow}\n")
+    f.write(f"Потік пропускної здатності: {capacity_flow} на індексі {capacity_index}\n")
+    f.write(f"Конфігурація при потоці пропускної здатності:\n")
     config_at_capacity = configs_with_stats_items[capacity_index][0]
     f.write(config_at_capacity.get_short_description())
-  print(f"Flow capacity stats saved to {config.outputFilePrefix}/flow-capacity-stats.txt")
+
+    f.write(f"\nМаксимальна швидкість: {max_velocity} на індексі {max_velocity_index}\n")
+    f.write(f"Конфігурація при максимальній швидкості:\n")
+    config_at_max_velocity = configs_with_stats_items[max_velocity_index][0]
+    f.write(config_at_max_velocity.get_short_description())
+    
+  print(f"Статистика пропускної здатності потоку збережена у {config.outputFilePrefix}/flow-capacity-stats.txt")
   pass
 
 def density_flow(density: np.ndarray, flow: np.ndarray, config: Config, varying_param: list[ConfigOptionMap]) -> None:
   """ density vs flow diagram """
   figure = plt.figure()
   figure.set_size_inches(8, 6)
-  figure.suptitle(f"Config params:\n{config.get_short_description(varying_param)}")
+  figure.suptitle(f"Параметри конфігурації:\n{config.get_short_description(varying_param)}")
 
   ax = plt.gca()
   ax.xaxis.set_major_locator(MultipleLocator(0.2))
@@ -177,9 +186,9 @@ def density_flow(density: np.ndarray, flow: np.ndarray, config: Config, varying_
 
   plt.scatter(density, flow, c='blue', s=3)
   plt.plot(density, flow, color='red', linewidth=1)
-  plt.title("Density vs Flow")
-  plt.xlabel("Density")
-  plt.ylabel("Flow")
+  plt.title("Щільність - потік")
+  plt.xlabel("Щільність")
+  plt.ylabel("Потік")
   plt.tight_layout()
   save_plot_as_png(plt, config.outputFilePrefix, "density-flow")
 
@@ -195,7 +204,7 @@ def density_flow_all_in_one(densities: np.ndarray,
   deltas = [ConfigOptionMap.from_field_name(varying_param[0][0])]
   if delta not in deltas:
     deltas.append(delta)
-  figure.suptitle(f"Config params:\n{config.get_short_description(deltas)}")
+  figure.suptitle(f"Параметри конфігурації:\n{config.get_short_description(deltas)}")
 
   ax = plt.gca()
   ax.xaxis.set_major_locator(MultipleLocator(0.2))
@@ -205,8 +214,8 @@ def density_flow_all_in_one(densities: np.ndarray,
   for i in range(len(densities)):
     plt.plot(densities[i], flows[i], linewidth=1, label=f"{varying_param[i][0]}={varying_param[i][1]}")
   plt.legend()
-  plt.title("Densities vs Flows (all in one)")
-  plt.xlabel("Density")
-  plt.ylabel("Flow")
+  plt.title("Щільність - потік")
+  plt.xlabel("Щільність")
+  plt.ylabel("Потік")
   plt.tight_layout()
   save_plot_as_png(plt, config.outputFilePrefix, "density-flow-all-in-one")

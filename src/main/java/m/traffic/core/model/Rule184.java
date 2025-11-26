@@ -28,7 +28,7 @@ public class Rule184 implements TrafficModel {
   @Override
   public void initialise(SimulationConfig config) {
     if (config.getMaxSpeed() != 1) {
-      throw new IllegalArgumentException("Rule 184 requires max speed to be 1");
+      throw new IllegalArgumentException("Для моделі Rule 184 максимальна швидкість повинна бути 1.");
     }
     this.config = config;
     random = new Random(config.getRandomSeed());

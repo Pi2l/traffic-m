@@ -63,7 +63,7 @@ def read_all_configs(config_path: str) -> tuple[list[Config], Config]:
     config = parse_config_from_filename(default_config, simulation_result_dir_str)
     config.outputFilePrefix = simulation_result_dir
     configs.append(config)
-    print(f"Parsed config from dir name: {simulation_result_dir_str} -> {configs[-1]}")
+    print(f"Розпізнано конфігурацію з імені директорії: {simulation_result_dir_str} -> {configs[-1]}")
   return configs, default_config
 
 def build_configs(configs: list[Config], param: str) -> list[Config]:

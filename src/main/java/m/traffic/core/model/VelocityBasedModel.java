@@ -177,9 +177,6 @@ public class VelocityBasedModel implements TrafficModel {
 
     if (carCurrentVelocity == 0 && randomValue < config.getStartAccelerationProbability()) { // slow to start rule
       currentCar.setVelocity(carAcceleratedVelocity - 1);
-    } else if (randomValue < config.getLowSpeedThresholdBrakingProbability() && carCurrentVelocity < config.getLowSpeedThreshold()) {
-      // low speed car less likely to brake
-      currentCar.setVelocity(carAcceleratedVelocity - 1);
     } else if (randomValue < config.getBrakingProbability()) {
       // normal braking
       currentCar.setVelocity(carAcceleratedVelocity - 1);

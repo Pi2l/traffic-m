@@ -40,21 +40,20 @@ public class StatsCollector {
 
   private String getPrefix(SimulationConfig config) {
     // file name should be: file_prefix + road length + car count + max speed + braking p. + other configs from specific model confings
-    String filePrefix = "%s_L=%d_N=%d_Vmax=%d_p=%.2f".formatted(
+    String filePrefix = "%s_L=%d_N=%d_Vmax=%d_p=%.2f_randomSeed=%d".formatted(
           config.getOutputFilePrefix(),
           config.getRoadLength(),
           config.getCarCount(),
           config.getMaxSpeed(),
-          config.getBrakingProbability()
+          config.getBrakingProbability(),
+          config.getRandomSeed()
         );
 
     if (config.getModelType() == ModelType.VELOCITY_BASED_MODEL && 
         config instanceof VelocityBasedModelConfig abmConfig) {
-      // startAccelerationProbability, lowSpeedThreshold, lowSpeedThresholdBrakingProbability
-      filePrefix += "_p0=%.2f_LST=%d_pLST=%.2f_pMSP=%.2f".formatted(
+      // startAccelerationProbability, maxSpeedBrakingProbability
+      filePrefix += "_p0=%.2f_pm=%.2f".formatted(
           abmConfig.getStartAccelerationProbability(),
-          abmConfig.getLowSpeedThreshold(),
-          abmConfig.getLowSpeedThresholdBrakingProbability(),
           abmConfig.getMaxSpeedBrakingProbability()
       );
     }
@@ -65,7 +64,7 @@ public class StatsCollector {
     File directory = new File(directoryName);
     if (!directory.exists()) {
       if (!directory.mkdirs()) {
-        throw new RuntimeException("Failed to create directory: " + directoryName);
+        throw new RuntimeException("Не вдалось створити директорію: " + directoryName);
       }
     }
   }

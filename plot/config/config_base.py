@@ -4,15 +4,14 @@ from config.model_type import ModelType
 
 
 class ConfigOptionMap(StrEnum):
-  # ab_L=1000_N=200_Vmax=5_p=0.33p0=0.70_LST=2_pLST=0.20_pMSP=0.30
+  # ab_L=1000_N=200_Vmax=5_p=0.33_randomSeed=311_p0=0.70_pm=0.30
   ROAD_LENGTH = "L"
   CAR_COUNT = "N"
   MAX_SPEED = "Vmax"
   BRAKING_PROBABILITY = "p"
+  RANDOM_SEED = "randomSeed"
   P0_PROBABILITY = "p0"
-  LOW_SPEED_THRESHOLD = "LST"
-  P_LOW_SPEED_THRESHOLD = "pLST"
-  P_AT_MAX_SPEED = "pMSP"
+  P_AT_MAX_SPEED = "pm"
 
   @classmethod
   def get_value_of_mapping(cls):
@@ -21,9 +20,8 @@ class ConfigOptionMap(StrEnum):
       "carCount": cls.CAR_COUNT,
       "maxSpeed": cls.MAX_SPEED,
       "brakingProbability": cls.BRAKING_PROBABILITY,
+      "randomSeed": cls.RANDOM_SEED,
       "startAccelerationProbability": cls.P0_PROBABILITY,
-      # "lowSpeedThreshold": cls.LOW_SPEED_THRESHOLD,
-      # "lowSpeedThresholdBrakingProbability": cls.P_LOW_SPEED_THRESHOLD,
       "maxSpeedBrakingProbability": cls.P_AT_MAX_SPEED,
     }
 
@@ -33,7 +31,7 @@ class ConfigOptionMap(StrEnum):
     if field_name in value_of:
       return value_of[field_name]
     else:
-      raise ValueError(f"Unknown field name: {field_name}")
+      raise ValueError(f"Невідоме поле: {field_name}")
 
   @classmethod
   def to_field_name(cls, option_map: 'ConfigOptionMap'):
@@ -41,7 +39,7 @@ class ConfigOptionMap(StrEnum):
     for field_name, mapping in value_of.items():
       if mapping == option_map:
         return field_name
-    raise ValueError(f"Unknown option map: {option_map}")
+    raise ValueError(f"Невідомий параметр: {option_map}")
 
 class Config:
   KEYS_TO_IGNORE = {"outputFilePrefix", "isCyclic", "stepDuration"}
@@ -58,8 +56,6 @@ class Config:
     self.randomSeed = 0
     self.modelType = ModelType.CELLULAR_AUTOMATON
     self.startAccelerationProbability = 0.0 # p0
-    self.lowSpeedThreshold = 0
-    self.lowSpeedThresholdBrakingProbability = 0.0
     self.useMaxSpeedBrakingProbability = False
     self.maxSpeedBrakingProbability = 0.0
 
@@ -86,17 +82,13 @@ class Config:
       self.modelType = ModelType(value)
     elif key == "startAccelerationProbability":
       self.startAccelerationProbability = float(value)
-    elif key == "lowSpeedThreshold":
-      self.lowSpeedThreshold = int(value)
-    elif key == "lowSpeedThresholdBrakingProbability":
-      self.lowSpeedThresholdBrakingProbability = float(value)
     elif key == "useMaxSpeedBrakingProbability":
       self.useMaxSpeedBrakingProbability = value.lower() in ("true", "1", "yes")
     elif key == "maxSpeedBrakingProbability":
       self.maxSpeedBrakingProbability = float(value)
       
     else:
-      raise ValueError(f"Unknown config key: {key}")
+      raise ValueError(f"Невідоме поле: {key}")
 
   def get_short_description(self, varying_params: list[ConfigOptionMap] = None) -> str:
     if varying_params is None:
@@ -111,6 +103,8 @@ class Config:
       description_parts.append(f"Vmax={self.maxSpeed}")
     if ConfigOptionMap.BRAKING_PROBABILITY not in varying_params:
       description_parts.append(f"p={self.brakingProbability}")
+    # if ConfigOptionMap.RANDOM_SEED not in varying_params:
+    #   description_parts.append(f"початкове_значення_генератора={self.randomSeed}")
 
     if self.modelType == ModelType.CELLULAR_AUTOMATON:
       general_description = ", ".join(description_parts)
@@ -118,10 +112,6 @@ class Config:
     elif self.modelType == ModelType.VELOCITY_BASED_MODEL:
       if ConfigOptionMap.P0_PROBABILITY not in varying_params:
         description_parts.append(f"p0={self.startAccelerationProbability}")
-      # if ConfigOptionMap.LOW_SPEED_THRESHOLD not in varying_params:
-      #   description_parts.append(f"LST={self.lowSpeedThreshold}")
-      # if ConfigOptionMap.P_LOW_SPEED_THRESHOLD not in varying_params:
-      #   description_parts.append(f"pLST={self.lowSpeedThresholdBrakingProbability}")
       if ConfigOptionMap.P_AT_MAX_SPEED not in varying_params:
         description_parts.append(f"p_m={self.maxSpeedBrakingProbability}")
 
@@ -130,11 +120,10 @@ class Config:
     return description
 
   def __str__(self):
-    return (f"Config(roadLength={self.roadLength}, carCount={self.carCount}, maxSpeed={self.maxSpeed}, "
-            f"stepDuration={self.stepDuration}, brakingProbability={self.brakingProbability}, isCyclic={self.isCyclic}, "
+    return (f"Config(L={self.roadLength}, N={self.carCount}, Vmax={self.maxSpeed}, "
+            f"stepDuration={self.stepDuration}, p={self.brakingProbability}, замкнена_дорога={self.isCyclic}, "
             f"outputFilePrefix='{self.outputFilePrefix}', stepCount={self.stepCount}, randomSeed={self.randomSeed}, "
             f"modelType={self.modelType}, startAccelerationProbability={self.startAccelerationProbability}, "
-            f"lowSpeedThreshold={self.lowSpeedThreshold}, lowSpeedThresholdBrakingProbability={self.lowSpeedThresholdBrakingProbability}, "
             f"maxSpeedBrakingProbability={self.maxSpeedBrakingProbability})")
 
   # operator to compare two configs that whould be used for sorting
@@ -152,10 +141,6 @@ class Config:
       return self.brakingProbability < other.brakingProbability
     if self.startAccelerationProbability != other.startAccelerationProbability:
       return self.startAccelerationProbability < other.startAccelerationProbability
-    if self.lowSpeedThreshold != other.lowSpeedThreshold:
-      return self.lowSpeedThreshold < other.lowSpeedThreshold
-    if self.lowSpeedThresholdBrakingProbability != other.lowSpeedThresholdBrakingProbability:
-      return self.lowSpeedThresholdBrakingProbability < other.lowSpeedThresholdBrakingProbability
     if self.maxSpeedBrakingProbability != other.maxSpeedBrakingProbability:
       return self.maxSpeedBrakingProbability < other.maxSpeedBrakingProbability
     return False

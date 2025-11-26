@@ -21,16 +21,14 @@ def parse_config_from_filename(original_config: Config, file_name: str) -> Confi
       config.maxSpeed = int(value)
     elif key == ConfigOptionMap.BRAKING_PROBABILITY:
       config.brakingProbability = float(value)
+    elif key == ConfigOptionMap.RANDOM_SEED:
+      config.randomSeed = int(value)
     elif key == ConfigOptionMap.P0_PROBABILITY:
       config.startAccelerationProbability = float(value)
-    elif key == ConfigOptionMap.LOW_SPEED_THRESHOLD:
-      config.lowSpeedThreshold = int(value)
-    elif key == ConfigOptionMap.P_LOW_SPEED_THRESHOLD:
-      config.lowSpeedThresholdBrakingProbability = float(value)
     elif key == ConfigOptionMap.P_AT_MAX_SPEED:
       config.maxSpeedBrakingProbability = float(value)
     else:
-      raise ValueError(f"Unknown config key: {key} in file name: {file_name}")
+      raise ValueError(f"Невідоме поле: {key} у файлі з назвою: {file_name}")
 
   return config
 
@@ -41,7 +39,7 @@ def read_default_config_from_file(config_path: str) -> Config:
     for line in lines:
       # for property find the first '=' character and split by it
       separator_index = line.find("=")
-      if separator_index == -1: raise ValueError(f"Invalid property line: {line}")
+      if separator_index == -1: raise ValueError(f"Неправильний рядок властивості: {line}")
       key, value = line[:separator_index], line[separator_index + 1:]
       config.setField(key.strip(), value.strip())
   return config
@@ -78,5 +76,5 @@ def build_dir_name_from_params(config: Config):
   prefix = config.outputFilePrefix.split("/")[-1]
   dir_name = f"{prefix}_L={config.roadLength}_N={config.carCount}_Vmax={config.maxSpeed}_p={config.brakingProbability:.2f}"
   if config.modelType == ModelType.VELOCITY_BASED_MODEL:
-      dir_name += f"p0={config.startAccelerationProbability:.2f}_LST={config.lowSpeedThreshold}_pLST={config.lowSpeedThresholdBrakingProbability:.2f}_pMSP={config.maxSpeedBrakingProbability:.2f}"
+      dir_name += f"p0={config.startAccelerationProbability:.2f}_pm={config.maxSpeedBrakingProbability:.2f}"
   return dir_name

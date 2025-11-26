@@ -23,8 +23,6 @@ enum OptionType {
   MAX_SPEED("v", "deltaMaxSpeed"), //format: min:max:delta
   BRAKING_PROBABILITY("p", "deltaBrakingProbability"),
   P0_PROBABILITY("s", "deltaP0Probability"),
-  LOW_SPEED_THRESHOLD("t", "deltaLowSpeedThreshold"),
-  LOW_SPEED_THRESHOLD_BRAKING_PROBABILITY("q", "deltaLowSpeedThresholdBrakingProbability"),
   START_ACCELERATION_PROBABILITY("m", "deltaStartAccelerationProbability"),
   STEP_COUNT("i", "stepCount"), //i stands for iterations
   CONFIG_FILE("c", "configFile");
@@ -60,13 +58,6 @@ public class ConfigParser {
         .addOption( createOption(OptionType.P0_PROBABILITY.shortName,
                                  OptionType.P0_PROBABILITY.longName,
                                  OptionType.P0_PROBABILITY.name(), "delta initial acceleration probability", false) )
-        .addOption( createOption(OptionType.LOW_SPEED_THRESHOLD.shortName,
-                                 OptionType.LOW_SPEED_THRESHOLD.longName,
-                                 OptionType.LOW_SPEED_THRESHOLD.name(), "delta low speed (t)hreshold", false) )
-        .addOption( createOption(OptionType.LOW_SPEED_THRESHOLD_BRAKING_PROBABILITY.shortName,
-                                 OptionType.LOW_SPEED_THRESHOLD_BRAKING_PROBABILITY.longName,
-                                 OptionType.LOW_SPEED_THRESHOLD_BRAKING_PROBABILITY.name(),
-                                 "delta low speed threshold braking probability", false) )
         .addOption( createOption(OptionType.START_ACCELERATION_PROBABILITY.shortName,
                                  OptionType.START_ACCELERATION_PROBABILITY.longName,
                                  OptionType.START_ACCELERATION_PROBABILITY.name(),
@@ -103,18 +94,6 @@ public class ConfigParser {
           (conf, value) -> {
             if (conf instanceof VelocityBasedModelConfig abmc) {
               abmc.setMaxSpeedBrakingProbability(value);
-            }
-          }));
-        case LOW_SPEED_THRESHOLD -> configs.addAll(parseIntConfig(commandLine, optionType, config,
-          (conf, value) -> {
-            if (conf instanceof VelocityBasedModelConfig abmc) {
-              abmc.setLowSpeedThreshold(value);
-            }
-          }));
-        case LOW_SPEED_THRESHOLD_BRAKING_PROBABILITY -> configs.addAll(parseDoubleConfig(commandLine, optionType, config,
-          (conf, value) -> {
-            if (conf instanceof VelocityBasedModelConfig abmc) {
-              abmc.setLowSpeedThresholdBrakingProbability(value);
             }
           }));
         case STEP_COUNT -> configs.addAll(parseIntConfig(commandLine, optionType, config, SimulationConfig::setStepCount));
@@ -235,11 +214,6 @@ public class ConfigParser {
       VelocityBasedModelConfig defaultConfig = VelocityBasedModelConfig.defaultConfig();
       double startAccelerationProbability = Double.parseDouble(configMap.getOrDefault("startAccelerationProbability",
                                       defaultConfig.getStartAccelerationProbability() + ""));
-      int lowSpeedThreshold = Integer.parseInt(configMap.getOrDefault("lowSpeedThreshold",
-                                      defaultConfig.getLowSpeedThreshold() + ""));
-      double lowSpeedThresholdBrakingProbability = Double.parseDouble(configMap.getOrDefault(
-                                      "lowSpeedThresholdBrakingProbability",
-                                      defaultConfig.getLowSpeedThresholdBrakingProbability() + ""));
       boolean useMaxSpeedBrakingProbability = Boolean.parseBoolean(configMap.getOrDefault(
                                       "useMaxSpeedBrakingProbability",
                                       defaultConfig.isUseMaxSpeedBrakingProbability() + ""));
@@ -259,8 +233,6 @@ public class ConfigParser {
                     baseConfig.getRandomSeed(),
                     baseConfig.getModelType(),
                     startAccelerationProbability,
-                    lowSpeedThreshold,
-                    lowSpeedThresholdBrakingProbability,
                     useMaxSpeedBrakingProbability,
                     maxSpeedBrakingProbability
       );

@@ -142,7 +142,8 @@ def density_average_speed_all_in_one(densities: np.ndarray,
   plt.grid(True, linestyle='--', linewidth=0.5, alpha=0.7, which='both')
 
   for i in range(len(densities)):
-    plt.plot(densities[i], average_speeds[i], linewidth=1, label=f"{varying_param[i][0]}={varying_param[i][1]}")
+    label = f"{ConfigOptionMap.from_field_name(varying_param[i][0])}={varying_param[i][1]}"
+    plt.plot(densities[i], average_speeds[i], linewidth=1, label=label)
   plt.legend()
   plt.title("Щільність - середня швидкість")
   plt.xlabel("Щільність")
@@ -212,7 +213,8 @@ def density_flow_all_in_one(densities: np.ndarray,
   plt.grid(True, linestyle='--', linewidth=0.5, alpha=0.7, which='both')
 
   for i in range(len(densities)):
-    plt.plot(densities[i], flows[i], linewidth=1, label=f"{varying_param[i][0]}={varying_param[i][1]}")
+    label = f"{ConfigOptionMap.from_field_name(varying_param[i][0])}={varying_param[i][1]}"
+    plt.plot(densities[i], flows[i], linewidth=1, label=label)
   plt.legend()
   plt.title("Щільність - потік")
   plt.xlabel("Щільність")

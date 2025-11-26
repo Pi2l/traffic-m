@@ -115,10 +115,6 @@ def filter_configs_by_criteria(configs: list[Config], filters: dict[ConfigOption
         config_value = config.brakingProbability
       elif option_map == ConfigOptionMap.P0_PROBABILITY:
         config_value = config.startAccelerationProbability
-      elif option_map == ConfigOptionMap.LOW_SPEED_THRESHOLD:
-        config_value = config.lowSpeedThreshold
-      elif option_map == ConfigOptionMap.P_LOW_SPEED_THRESHOLD:
-        config_value = config.lowSpeedThresholdBrakingProbability
       elif option_map == ConfigOptionMap.P_AT_MAX_SPEED:
         config_value = config.maxSpeedBrakingProbability
       

@@ -42,23 +42,22 @@
       "description": "Select a config file",
       "options": [
         "./src/main/resources/config",
-        "./src/main/resources/acceleration-based-config",
+        "./src/main/resources/velocity-based-config",
         "./src/main/resources/config-184"
       ],
-      "default": "acceleration-based-config"
+      "default": "velocity-based-config"
     },
     {
       "id": "config key",
       "type": "pickString",
-      "description": "select -n, -l, -v, -p, -s, -t, or -q argument\n n - car count\n l - road length\n v - max speed\n p - braking probability\n s - start acceleration probability\n t - low speed threshold\n q - low speed threshold braking probability",
+      "description": "select -n, -l, -v, -p, -s or -m argument\n n - car count\n l - road length\n v - max speed\n p - braking probability\n s - start acceleration probability\n m - max speed braking probability",
       "options": [
         "l",
         "n",
         "v",
         "p",
         "s",
-        "t",
-        "q"
+        "m"
       ],
       "default": "n"
     },
@@ -72,8 +71,7 @@
         "max-speed",
         "braking-probability",
         "start-acceleration-probability",
-        "low-speed-threshold",
-        "low-speed-threshold-braking-probability"
+        "max-speed-braking-probability"
       ],
       "default": "braking-probability"
     },

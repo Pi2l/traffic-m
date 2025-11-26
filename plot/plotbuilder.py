@@ -12,7 +12,7 @@ from stats.stats_reader import read_stats
 from draw.plot_utils import density_average_speed_all_in_one, density_flow_all_in_one, draw_space_time_diagram, density_flow, iterations_global_flow, density_average_speed, write_flow_capacity_stats
 
 # SEPARATE_PLOT = True
-SEPARATE_PLOT = False
+# SEPARATE_PLOT = False
 
 def draw_separate_plots(configs_with_stats: dict[Config, set], default_config: Config, delta_param: list[ConfigOptionMap]) -> None:
 
@@ -22,19 +22,19 @@ def draw_separate_plots(configs_with_stats: dict[Config, set], default_config: C
   # per config plots
   for config, stats in configs_with_stats.items():
     position, velocity, time, average_speed, density, flow = stats
-    if SEPARATE_PLOT:
-      draw_space_time_diagram(position, velocity, time, config.outputFilePrefix, config)
-      iterations_global_flow(time, flow, config)
+    # if SEPARATE_PLOT:
+    draw_space_time_diagram(position, velocity, time, config.outputFilePrefix, config)
+    iterations_global_flow(time, flow, config)
 
     densities_per_config.append(density[-1])
     average_speeds_per_config.append(average_speed[-1])
     flows_per_config.append(flow[-1])
 
   # plots based on delta rho (that is varying density)
-  if not SEPARATE_PLOT and (ConfigOptionMap.ROAD_LENGTH in delta_param or ConfigOptionMap.CAR_COUNT in delta_param):
+  if (ConfigOptionMap.ROAD_LENGTH in delta_param or ConfigOptionMap.CAR_COUNT in delta_param):
     density_average_speed(np.array(densities_per_config), np.array(average_speeds_per_config), default_config, delta_param)
     density_flow(np.array(densities_per_config), np.array(flows_per_config), default_config, delta_param)
-    write_flow_capacity_stats(np.array(flows_per_config), default_config, list(configs_with_stats.items()))
+    write_flow_capacity_stats(np.array(flows_per_config), default_config, list(configs_with_stats.items()), np.array(average_speeds_per_config))
 
 def draw_combined_plots(grouped_configs: dict[tuple[str, int | float], list[Config]],
                         default_config: Config,
@@ -139,16 +139,6 @@ def get_global_plot_dir(default_config: Config) -> Config:
   return config
 
 def main() -> int:
-  # 0:1:0.01
-  # plan:
-  # 1. read config file (done)
-  # 2. parse configs based on files names inside outputFilePrefix dir (done)
-  # 3. determine varying (param that changes) parameter based on configs (done)
-  # 4. read stats files (done)
-  # 5. draw all plots
-  #   a. separate plots for each config
-  #   b. combined plots for all configs based on varying parameter
-  # 6. save plots to outputFilePrefix + "/plots/" + "_plots.png"
 
   args = get_args()
   configs, default_config = read_all_configs(args.config_file)
@@ -178,8 +168,8 @@ def main() -> int:
       print(f.result())
 
   config = get_global_plot_dir(default_config)
-  if not SEPARATE_PLOT:
-    draw_combined_plots(grouped_configs, config, configs_with_stats)
+  # if not SEPARATE_PLOT:
+  draw_combined_plots(grouped_configs, config, configs_with_stats)
   pass
 
 def compute_stats_for_config(group_key, group_configs, default_config, configs_with_stats):

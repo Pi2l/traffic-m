@@ -6,14 +6,14 @@ import m.traffic.core.model.type.ModelType;
 
 @Getter
 @Setter
-public class AccelerationBasedModelConfig extends SimulationConfig {
+public class VelocityBasedModelConfig extends SimulationConfig {
   private double startAccelerationProbability;
   private int lowSpeedThreshold;
   private double lowSpeedThresholdBrakingProbability;
   private boolean useMaxSpeedBrakingProbability;
   private double maxSpeedBrakingProbability;
     
-  public AccelerationBasedModelConfig(int roadLength, int carCount, int maxSpeed,
+  public VelocityBasedModelConfig(int roadLength, int carCount, int maxSpeed,
       int stepDuration, double brakingProbability, boolean isCyclic, String outputFilePrefix,
       int stepCount, long randomSeed, ModelType modelType,
       double startAccelerationProbability, int lowSpeedThreshold, double lowSpeedThresholdBrakingProbability,
@@ -32,9 +32,9 @@ public class AccelerationBasedModelConfig extends SimulationConfig {
     this.maxSpeedBrakingProbability = lowSpeedBrakingProbability;
   }
 
-  public static AccelerationBasedModelConfig defaultConfig() {
+  public static VelocityBasedModelConfig defaultConfig() {
     SimulationConfig baseConfig = SimulationConfig.defaultConfig();
-    return new AccelerationBasedModelConfig(
+    return new VelocityBasedModelConfig(
       baseConfig.getRoadLength(),
       baseConfig.getCarCount(),
       baseConfig.getMaxSpeed(),
@@ -53,8 +53,8 @@ public class AccelerationBasedModelConfig extends SimulationConfig {
     );
   }
 
-  public static AccelerationBasedModelConfig copyConfig(AccelerationBasedModelConfig config) {
-    return new AccelerationBasedModelConfig(
+  public static VelocityBasedModelConfig copyConfig(VelocityBasedModelConfig config) {
+    return new VelocityBasedModelConfig(
         config.getRoadLength(),
         config.getCarCount(),
         config.getMaxSpeed(),

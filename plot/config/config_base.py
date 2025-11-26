@@ -115,7 +115,7 @@ class Config:
     if self.modelType == ModelType.CELLULAR_AUTOMATON:
       general_description = ", ".join(description_parts)
       description = f"NaSch: {general_description}"
-    elif self.modelType == ModelType.ACCELERATION_BASED_MODEL:
+    elif self.modelType == ModelType.VELOCITY_BASED_MODEL:
       if ConfigOptionMap.P0_PROBABILITY not in varying_params:
         description_parts.append(f"p0={self.startAccelerationProbability}")
       # if ConfigOptionMap.LOW_SPEED_THRESHOLD not in varying_params:

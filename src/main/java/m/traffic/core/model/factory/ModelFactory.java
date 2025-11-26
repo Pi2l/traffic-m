@@ -1,6 +1,6 @@
 package m.traffic.core.model.factory;
 
-import m.traffic.core.model.AccelerationBasedModel;
+import m.traffic.core.model.VelocityBasedModel;
 import m.traffic.core.model.CellularAutomatonModel;
 import m.traffic.core.model.Rule184;
 import m.traffic.core.model.TrafficModel;
@@ -18,8 +18,8 @@ public class ModelFactory {
         return new CellularAutomatonModel();
       case RULE_184:
         return new Rule184();
-      case ACCELERATION_BASED_MODEL:
-        return new AccelerationBasedModel();
+      case VELOCITY_BASED_MODEL:
+        return new VelocityBasedModel();
       default:
         throw new IllegalArgumentException("Unknown model type: " + modelType);
     }

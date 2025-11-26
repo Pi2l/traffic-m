@@ -77,6 +77,6 @@ def select_from_configs(configs: list[Config], option_map: ConfigOptionMap) -> l
 def build_dir_name_from_params(config: Config):
   prefix = config.outputFilePrefix.split("/")[-1]
   dir_name = f"{prefix}_L={config.roadLength}_N={config.carCount}_Vmax={config.maxSpeed}_p={config.brakingProbability:.2f}"
-  if config.modelType == ModelType.ACCELERATION_BASED_MODEL:
+  if config.modelType == ModelType.VELOCITY_BASED_MODEL:
       dir_name += f"p0={config.startAccelerationProbability:.2f}_LST={config.lowSpeedThreshold}_pLST={config.lowSpeedThresholdBrakingProbability:.2f}_pMSP={config.maxSpeedBrakingProbability:.2f}"
   return dir_name

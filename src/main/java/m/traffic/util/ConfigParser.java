@@ -13,7 +13,7 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import m.traffic.core.data.config.AccelerationBasedModelConfig;
+import m.traffic.core.data.config.VelocityBasedModelConfig;
 import m.traffic.core.data.config.SimulationConfig;
 import m.traffic.core.model.type.ModelType;
 
@@ -25,6 +25,7 @@ enum OptionType {
   P0_PROBABILITY("s", "deltaP0Probability"),
   LOW_SPEED_THRESHOLD("t", "deltaLowSpeedThreshold"),
   LOW_SPEED_THRESHOLD_BRAKING_PROBABILITY("q", "deltaLowSpeedThresholdBrakingProbability"),
+  START_ACCELERATION_PROBABILITY("m", "deltaStartAccelerationProbability"),
   STEP_COUNT("i", "stepCount"), //i stands for iterations
   CONFIG_FILE("c", "configFile");
 
@@ -66,6 +67,10 @@ public class ConfigParser {
                                  OptionType.LOW_SPEED_THRESHOLD_BRAKING_PROBABILITY.longName,
                                  OptionType.LOW_SPEED_THRESHOLD_BRAKING_PROBABILITY.name(),
                                  "delta low speed threshold braking probability", false) )
+        .addOption( createOption(OptionType.START_ACCELERATION_PROBABILITY.shortName,
+                                 OptionType.START_ACCELERATION_PROBABILITY.longName,
+                                 OptionType.START_ACCELERATION_PROBABILITY.name(),
+                                 "delta start acceleration probability", false) )
         .addOption( createOption(OptionType.STEP_COUNT.shortName,
                                  OptionType.STEP_COUNT.longName,
                                  OptionType.STEP_COUNT.name(), "number of steps to simulate", false) )
@@ -90,19 +95,25 @@ public class ConfigParser {
         case BRAKING_PROBABILITY -> configs.addAll(parseDoubleConfig(commandLine, optionType, config, SimulationConfig::setBrakingProbability));
         case P0_PROBABILITY -> configs.addAll(parseDoubleConfig(commandLine, optionType, config,
           (conf, value) -> {
-            if (conf instanceof AccelerationBasedModelConfig abmc) {
+            if (conf instanceof VelocityBasedModelConfig abmc) {
               abmc.setStartAccelerationProbability(value);
+            }
+          }));
+        case START_ACCELERATION_PROBABILITY -> configs.addAll(parseDoubleConfig(commandLine, optionType, config,
+          (conf, value) -> {
+            if (conf instanceof VelocityBasedModelConfig abmc) {
+              abmc.setMaxSpeedBrakingProbability(value);
             }
           }));
         case LOW_SPEED_THRESHOLD -> configs.addAll(parseIntConfig(commandLine, optionType, config,
           (conf, value) -> {
-            if (conf instanceof AccelerationBasedModelConfig abmc) {
+            if (conf instanceof VelocityBasedModelConfig abmc) {
               abmc.setLowSpeedThreshold(value);
             }
           }));
         case LOW_SPEED_THRESHOLD_BRAKING_PROBABILITY -> configs.addAll(parseDoubleConfig(commandLine, optionType, config,
           (conf, value) -> {
-            if (conf instanceof AccelerationBasedModelConfig abmc) {
+            if (conf instanceof VelocityBasedModelConfig abmc) {
               abmc.setLowSpeedThresholdBrakingProbability(value);
             }
           }));
@@ -139,7 +150,7 @@ public class ConfigParser {
   private static SimulationConfig copyConfig(SimulationConfig config) {
     return switch (config.getModelType()) {
       case CELLULAR_AUTOMATON, RULE_184 -> SimulationConfig.copyConfig(config);
-      case ACCELERATION_BASED_MODEL -> AccelerationBasedModelConfig.copyConfig((AccelerationBasedModelConfig) config);
+      case VELOCITY_BASED_MODEL -> VelocityBasedModelConfig.copyConfig((VelocityBasedModelConfig) config);
     };
   }
 
@@ -182,7 +193,7 @@ public class ConfigParser {
     SimulationConfig config = getSimulationConfig(configMap);
     return switch (config.getModelType()) {
       case CELLULAR_AUTOMATON, RULE_184 -> config;
-      case ACCELERATION_BASED_MODEL -> getAccelerationBasedModelConfig(config, configMap);
+      case VELOCITY_BASED_MODEL -> getVelocityBasedModelConfig(config, configMap);
     };
   }
 
@@ -218,10 +229,10 @@ public class ConfigParser {
     }
   }
 
-  private static AccelerationBasedModelConfig getAccelerationBasedModelConfig(SimulationConfig baseConfig,
-                                                                            HashMap<String, String> configMap) {
+  private static VelocityBasedModelConfig getVelocityBasedModelConfig(SimulationConfig baseConfig,
+                                                                      HashMap<String, String> configMap) {
     try {
-      AccelerationBasedModelConfig defaultConfig = AccelerationBasedModelConfig.defaultConfig();
+      VelocityBasedModelConfig defaultConfig = VelocityBasedModelConfig.defaultConfig();
       double startAccelerationProbability = Double.parseDouble(configMap.getOrDefault("startAccelerationProbability",
                                       defaultConfig.getStartAccelerationProbability() + ""));
       int lowSpeedThreshold = Integer.parseInt(configMap.getOrDefault("lowSpeedThreshold",
@@ -236,7 +247,7 @@ public class ConfigParser {
                                       "maxSpeedBrakingProbability",
                                       defaultConfig.getMaxSpeedBrakingProbability() + ""));
 
-      return new AccelerationBasedModelConfig(
+      return new VelocityBasedModelConfig(
                     baseConfig.getRoadLength(),
                     baseConfig.getCarCount(),
                     baseConfig.getMaxSpeed(),

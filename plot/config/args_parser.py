@@ -10,8 +10,7 @@ def get_args(param: str = None) -> argparse.Namespace:
   parser.add_argument("-v", "--max-speed", type=str, help="Max speed (1:10:1)")
   parser.add_argument("-p", "--braking-probability", type=str, help="Braking probability (0.0:1.0:0.1)")
   parser.add_argument("-s", "--start-acceleration-probability", type=str, help="Start acceleration probability (0.0:1.0:0.1)")
-  parser.add_argument("-t", "--low-speed-threshold", type=str, help="Low speed threshold (1:10:1)")
-  parser.add_argument("-q", "--low-speed-threshold-braking-probability", type=str, help="Low speed threshold braking probability (0.0:1.0:0.1)")
+  parser.add_argument("-m", "--max-speed-braking-probability", type=str, help="Max speed braking probability (0.0:1.0:0.1)")
   
   # Secondary filtering arguments
   parser.add_argument("--select-road-length", type=str, help="Select road length (50:200:10)")
@@ -19,8 +18,6 @@ def get_args(param: str = None) -> argparse.Namespace:
   parser.add_argument("--select-max-speed", type=str, help="Select max speed (1:10:1)")
   parser.add_argument("--select-braking-probability", type=str, help="Select braking probability (0.0:1.0:0.1)")
   parser.add_argument("--select-start-acceleration-probability", type=str, help="Select start acceleration probability (0.0:1.0:0.1)")
-  parser.add_argument("--select-low-speed-threshold", type=str, help="Select low speed threshold (1:10:1)")
-  parser.add_argument("--select-low-speed-threshold-braking-probability", type=str, help="Select low speed threshold braking probability (0.0:1.0:0.1)")
   parser.add_argument("--select-max-speed-braking-probability", type=str, help="Select max speed braking probability (0.0:1.0:0.1)")
   
 # configuration arguments
@@ -69,10 +66,10 @@ def parse_primary_filters(args) -> dict[ConfigOptionMap, list[float | int]]:
     filters[ConfigOptionMap.BRAKING_PROBABILITY] = parse_range_value(args.braking_probability)
   if args.start_acceleration_probability:
     filters[ConfigOptionMap.START_ACCELERATION_PROBABILITY] = parse_range_value(args.start_acceleration_probability)
-  if args.low_speed_threshold:
-    filters[ConfigOptionMap.LOW_SPEED_THRESHOLD] = parse_range_value(args.low_speed_threshold)
-  if args.low_speed_threshold_braking_probability:
-    filters[ConfigOptionMap.LOW_SPEED_THRESHOLD_BRAKING_PROBABILITY] = parse_range_value(args.low_speed_threshold_braking_probability)
+  # if args.low_speed_threshold:
+  #   filters[ConfigOptionMap.LOW_SPEED_THRESHOLD] = parse_range_value(args.low_speed_threshold)
+  # if args.low_speed_threshold_braking_probability:
+  #   filters[ConfigOptionMap.LOW_SPEED_THRESHOLD_BRAKING_PROBABILITY] = parse_range_value(args.low_speed_threshold_braking_probability)
     
   return filters
 
@@ -90,10 +87,10 @@ def parse_secondary_filters(args) -> dict[ConfigOptionMap, list[float | int]]:
     filters[ConfigOptionMap.BRAKING_PROBABILITY] = parse_range_value(args.select_braking_probability)
   if args.select_start_acceleration_probability:
     filters[ConfigOptionMap.P0_PROBABILITY] = parse_range_value(args.select_start_acceleration_probability)
-  if args.select_low_speed_threshold:
-    filters[ConfigOptionMap.LOW_SPEED_THRESHOLD] = parse_range_value(args.select_low_speed_threshold)
-  if args.select_low_speed_threshold_braking_probability:
-    filters[ConfigOptionMap.LOW_SPEED_THRESHOLD_BRAKING_PROBABILITY] = parse_range_value(args.select_low_speed_threshold_braking_probability)
+  # if args.select_low_speed_threshold:
+  #   filters[ConfigOptionMap.LOW_SPEED_THRESHOLD] = parse_range_value(args.select_low_speed_threshold)
+  # if args.select_low_speed_threshold_braking_probability:
+  #   filters[ConfigOptionMap.LOW_SPEED_THRESHOLD_BRAKING_PROBABILITY] = parse_range_value(args.select_low_speed_threshold_braking_probability)
   if args.select_max_speed_braking_probability:
     filters[ConfigOptionMap.P_AT_MAX_SPEED] = parse_range_value(args.select_max_speed_braking_probability)
     

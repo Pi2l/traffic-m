@@ -3,7 +3,7 @@ package m.traffic.core.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import m.traffic.core.data.config.AccelerationBasedModelConfig;
+import m.traffic.core.data.config.VelocityBasedModelConfig;
 import m.traffic.core.data.config.SimulationConfig;
 import m.traffic.core.data.simulation.Cell;
 import m.traffic.core.data.simulation.Vehicle;
@@ -11,11 +11,11 @@ import m.traffic.core.data.state.SimulationStatistics;
 import m.traffic.core.data.state.TrafficSnapshot;
 import m.traffic.stats.StatsCollector;
 
-public class AccelerationBasedModel implements TrafficModel {
+public class VelocityBasedModel implements TrafficModel {
   private static final int DETECTOR_POSITION = 0;
   private List<Cell> road;
   private List<Vehicle> cars;
-  private AccelerationBasedModelConfig config;
+  private VelocityBasedModelConfig config;
   private TrafficSnapshot trafficSnapshot;
   private SimulationStatistics simulationStatistics = new SimulationStatistics(0, 0, 0, 0);
   private StatsCollector statsCollector;
@@ -25,8 +25,8 @@ public class AccelerationBasedModel implements TrafficModel {
 
   @Override
   public void initialise(SimulationConfig config) {
-    if (!(config instanceof AccelerationBasedModelConfig abmConfig)) {
-      throw new IllegalArgumentException("Config should be of type AccelerationBasedModelConfig");
+    if (!(config instanceof VelocityBasedModelConfig abmConfig)) {
+      throw new IllegalArgumentException("Config should be of type VelocityBasedModelConfig");
     }
     this.config = abmConfig;
     random = new Random(abmConfig.getRandomSeed());

@@ -4,7 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import m.traffic.core.data.config.AccelerationBasedModelConfig;
+import m.traffic.core.data.config.VelocityBasedModelConfig;
 import m.traffic.core.data.config.SimulationConfig;
 import m.traffic.core.data.state.SimulationStatistics;
 import m.traffic.core.data.state.TrafficSnapshot;
@@ -48,8 +48,8 @@ public class StatsCollector {
           config.getBrakingProbability()
         );
 
-    if (config.getModelType() == ModelType.ACCELERATION_BASED_MODEL && 
-        config instanceof AccelerationBasedModelConfig abmConfig) {
+    if (config.getModelType() == ModelType.VELOCITY_BASED_MODEL && 
+        config instanceof VelocityBasedModelConfig abmConfig) {
       // startAccelerationProbability, lowSpeedThreshold, lowSpeedThresholdBrakingProbability
       filePrefix += "_p0=%.2f_LST=%d_pLST=%.2f_pMSP=%.2f".formatted(
           abmConfig.getStartAccelerationProbability(),

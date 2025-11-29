@@ -158,6 +158,7 @@ def write_flow_capacity_stats(flows: np.ndarray, config: Config, configs_with_st
 
   max_velocity = np.max(velocities)
   max_velocity_index = np.argmax(velocities)
+  average_velocity = np.mean(velocities)
 
   with open(f"{config.outputFilePrefix}/flow-capacity-stats.txt", "w") as f:
     f.write(f"Максимальний потік: {max_flow}\n")
@@ -168,6 +169,7 @@ def write_flow_capacity_stats(flows: np.ndarray, config: Config, configs_with_st
 
     f.write(f"\nМаксимальна швидкість: {max_velocity} на індексі {max_velocity_index}\n")
     f.write(f"Конфігурація при максимальній швидкості:\n")
+    f.write(f"Середня швидкість: {average_velocity}\n")
     config_at_max_velocity = configs_with_stats_items[max_velocity_index][0]
     f.write(config_at_max_velocity.get_short_description())
     

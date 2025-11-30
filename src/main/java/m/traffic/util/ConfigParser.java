@@ -128,7 +128,7 @@ public class ConfigParser {
 
   private static SimulationConfig copyConfig(SimulationConfig config) {
     return switch (config.getModelType()) {
-      case CELLULAR_AUTOMATON, RULE_184 -> SimulationConfig.copyConfig(config);
+      case NAGEL_SCHRECKENBERG, RULE_184 -> SimulationConfig.copyConfig(config);
       case VELOCITY_BASED_MODEL -> VelocityBasedModelConfig.copyConfig((VelocityBasedModelConfig) config);
     };
   }
@@ -171,7 +171,7 @@ public class ConfigParser {
 
     SimulationConfig config = getSimulationConfig(configMap);
     return switch (config.getModelType()) {
-      case CELLULAR_AUTOMATON, RULE_184 -> config;
+      case NAGEL_SCHRECKENBERG, RULE_184 -> config;
       case VELOCITY_BASED_MODEL -> getVelocityBasedModelConfig(config, configMap);
     };
   }

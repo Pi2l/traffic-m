@@ -54,7 +54,7 @@ class Config:
     self.outputFilePrefix = ""
     self.stepCount = 0
     self.randomSeed = 0
-    self.modelType = ModelType.CELLULAR_AUTOMATON
+    self.modelType = ModelType.NAGEL_SCHRECKENBERG_MODEL
     self.startAccelerationProbability = 0.0 # p0
     self.useMaxSpeedBrakingProbability = False
     self.maxSpeedBrakingProbability = 0.0
@@ -106,7 +106,7 @@ class Config:
     # if ConfigOptionMap.RANDOM_SEED not in varying_params:
     #   description_parts.append(f"початкове_значення_генератора={self.randomSeed}")
 
-    if self.modelType == ModelType.CELLULAR_AUTOMATON:
+    if self.modelType == ModelType.NAGEL_SCHRECKENBERG_MODEL:
       general_description = ", ".join(description_parts)
       description = f"NaSch: {general_description}"
     elif self.modelType == ModelType.VELOCITY_BASED_MODEL:

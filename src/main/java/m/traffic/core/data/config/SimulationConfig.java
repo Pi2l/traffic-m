@@ -26,7 +26,7 @@ public class SimulationConfig {
   private ModelType modelType;
 
   public static SimulationConfig defaultConfig() {
-    return new SimulationConfig(20, 3, 5, 100, 0.3f, false, "out/test", 200, 394, ModelType.CELLULAR_AUTOMATON);
+    return new SimulationConfig(20, 3, 5, 100, 0.3f, false, "out/test", 200, 394, ModelType.NAGEL_SCHRECKENBERG);
   }
 
   public static SimulationConfig copyConfig(SimulationConfig config) {

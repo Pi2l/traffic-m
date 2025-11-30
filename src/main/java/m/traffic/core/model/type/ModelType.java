@@ -1,7 +1,7 @@
 package m.traffic.core.model.type;
 
 public enum ModelType {
-  CELLULAR_AUTOMATON("Nagel_Schreckenberg"),
+  NAGEL_SCHRECKENBERG("Nagel_Schreckenberg"),
   RULE_184("rule184"),
   VELOCITY_BASED_MODEL("velocity_based_model");
 

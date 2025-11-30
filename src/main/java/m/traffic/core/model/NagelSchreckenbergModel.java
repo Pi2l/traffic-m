@@ -11,7 +11,7 @@ import m.traffic.core.data.state.SimulationStatistics;
 import m.traffic.core.data.state.TrafficSnapshot;
 import m.traffic.stats.StatsCollector;
 
-public class CellularAutomatonModel implements TrafficModel {
+public class NagelSchreckenbergModel implements TrafficModel {
   private static final int DETECTOR_POSITION = 0;
   private List<Cell> road;
   private List<Vehicle> cars;
